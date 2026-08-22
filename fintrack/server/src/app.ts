@@ -4,14 +4,17 @@ import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import { env } from "./config/env";
 import apiRoutes from "./routes";
+import { requestLogger } from "./middlewares/requestLogger";
 import { errorHandler } from "./middlewares/errorHandler";
 import { notFoundHandler } from "./middlewares/notFoundHandler";
 
 export const createApp = (): Express => {
   const app = express();
 
-  // Security Middleware
+  // Security Headers
   app.use(helmet());
+
+  // CORS Configuration
   app.use(
     cors({
       origin: env.CLIENT_URL,
@@ -21,7 +24,10 @@ export const createApp = (): Express => {
     })
   );
 
-  // Request Parsing Middleware
+  // Request Logging
+  app.use(requestLogger);
+
+  // Request Body Parsing
   app.use(express.json({ limit: "1mb" }));
   app.use(express.urlencoded({ extended: true, limit: "1mb" }));
   app.use(cookieParser(env.COOKIE_SECRET));
