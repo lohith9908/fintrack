@@ -1,0 +1,2 @@
+// Scaffolding for controllers
+export {};

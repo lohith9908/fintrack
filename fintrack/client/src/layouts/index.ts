@@ -1,0 +1,2 @@
+// Scaffolding for layouts
+export {};

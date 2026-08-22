@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+/.pnp
+.pnp.js
+
+# Production build output
+dist/
+build/
+out/
+
+# Environment configuration
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# File uploads and local storage
+uploads/
+*.sqlite
+*.log
+
+# Coverage and test output
+coverage/
+.nyc_output/
+
+# IDE and OS files
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Temporary files
+scratch/
+tmp/
+temp/
+*.tmp

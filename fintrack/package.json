@@ -1,0 +1,23 @@
+{
+  "name": "fintrack",
+  "version": "1.0.0",
+  "private": true,
+  "description": "FinTrack — Personal Finance Management Platform",
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "dev": "concurrently -n \"SERVER,CLIENT\" -c \"blue,green\" \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:server": "npm --prefix server run dev",
+    "dev:client": "npm --prefix client run dev",
+    "build": "npm --prefix server run build && npm --prefix client run build",
+    "lint": "npm --prefix server run lint && npm --prefix client run lint",
+    "typecheck": "npm --prefix server run typecheck && npm --prefix client run typecheck",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,css,md}\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "prettier": "^3.5.1"
+  }
+}
