@@ -1,63 +1,49 @@
-# FinTrack — Implementation Plan
-
-**Document:** `IMPLEMENTATION.md`  
-**Version:** 1.0  
-**Status:** Locked / Source of Truth  
-**Product:** FinTrack — Personal Finance Management Platform  
-**Related Documents:** `PRD.md`, `TRD.md`, `ARCHITECTURE.md`, `DATABASESCHEMA.md`, `UI/UX.md`, `WEBFLOW.md`  
-**Date:** 22 August 2026
-
+FinTrack — Implementation Plan
+Document: `IMPLEMENTATION.md`  
+Version: 2.0  
+Status: Locked / Source of Truth  
+Product: FinTrack — Personal Finance Management Platform  
+Related Documents: `PRD.md`, `TRD.md`, `ARCHITECTURE.md`, `DATABASESCHEMA.md`, `UI/UX.md`, `WEBFLOW.md`  
+Date: 22 August 2026
 ---
-
-# 1. Document Purpose
-
-This document defines the implementation roadmap for FinTrack from project initialization through production readiness.
-
-The implementation is divided into sequential phases.
-
-Each phase defines:
-
-- Objective
-- Scope
-- Backend work
-- Frontend work
-- Database work
-- Security work
-- Testing
-- Completion criteria
-
-The phases should be implemented in order unless a technical dependency requires otherwise.
-
+1. Document Purpose
+This document defines the complete implementation roadmap for FinTrack from project initialization through production release.
+The original implementation roadmap has been consolidated into 20 optimal phases without removing the approved product scope.
+The goal is to keep the implementation:
+Sequential
+Practical
+Testable
+Maintainable
+Portfolio-ready
+Production-oriented
+Each phase groups closely related work while preserving the same functional requirements previously defined.
+This document is the implementation and execution source of truth.
 ---
-
-# 2. Implementation Principles
-
+2. Locked Implementation Principles
 The project must follow these principles:
-
-1. Build from the locked source-of-truth documents.
-2. Complete foundational infrastructure before feature development.
-3. Implement backend authorization before exposing protected frontend features.
-4. Keep financial calculations backend-authoritative.
-5. Use deterministic internal logic for financial insights.
-6. Never integrate AI APIs or AI API keys.
-7. Keep secrets in environment variables.
-8. Never commit `.env`.
-9. Use `.env.example` as the configuration template.
-10. Use bcrypt for password hashing.
-11. Use JWT authentication with HTTP-only cookies.
-12. Use Multer for multipart file upload handling.
-13. Use MongoDB/Mongoose for persistence.
-14. Build responsive UI from the beginning.
-15. Test each feature before moving to the next phase.
-16. Keep commits small and meaningful.
-17. Avoid building placeholder architecture that will be discarded later.
-
+Build strictly from the locked source-of-truth documents.
+Complete foundational infrastructure before feature development.
+Implement backend authentication and authorization before protected frontend functionality.
+Keep financial calculations backend-authoritative.
+Keep all user data isolated by ownership.
+Use deterministic internal logic for financial insights.
+Do not integrate any AI API, AI API key, AI chatbot, or external AI financial service.
+Store passwords only as bcrypt hashes.
+Use JWT authentication with secure HTTP-only cookies.
+Use Multer for receipt upload handling.
+Keep secrets in environment variables.
+Never commit `.env`.
+Commit `.env.example`.
+Use MongoDB/Mongoose for persistence.
+Build responsive UI from the beginning.
+Test each major feature before moving forward.
+Keep business logic in backend services rather than route handlers.
+Use reusable frontend components.
+Do not duplicate financial calculation logic across features.
+Do not consider a feature complete until validation, authorization, error handling, and relevant tests exist.
 ---
-
-# 3. Locked Technology Stack
-
-## Frontend
-
+3. Locked Technology Stack
+Frontend
 ```text
 React
 TypeScript
@@ -68,38 +54,31 @@ Reusable component system
 Charting library
 Axios or equivalent HTTP client
 ```
-
-## Backend
-
+Backend
 ```text
 Node.js
 Express
 TypeScript
 Mongoose
+MongoDB
 JWT
 bcrypt
 Multer
 Validation library
 Centralized error handling
 ```
-
-## Database
-
+Database
 ```text
 MongoDB
 MongoDB Compass
 Mongoose
 ```
-
-## Reports
-
+Reports
 ```text
 CSV generation
 PDF generation
 ```
-
-## Tooling
-
+Development
 ```text
 Git
 GitHub
@@ -108,25 +87,17 @@ Prettier
 Environment variables
 Testing framework
 ```
-
 ---
-
-# 4. Environment Configuration
-
-Required files:
-
+4. Environment Configuration
+Required project configuration files:
 ```text
 .env
 .env.example
 .gitignore
 ```
-
-`.env` is local/private.
-
-`.env.example` is committed.
-
-Example configuration categories:
-
+`.env` is local/private and must never be committed.
+`.env.example` is committed and contains placeholders only.
+Expected configuration categories include:
 ```text
 NODE_ENV
 PORT
@@ -139,46 +110,11 @@ ADMIN_EMAIL
 ADMIN_PASSWORD
 UPLOAD limits
 FILE storage configuration
-EMAIL configuration
+EMAIL/reset-password configuration
 ```
-
-No real secrets may be placed in `.env.example`.
-
+No real credentials or secrets may be stored in `.env.example`.
 ---
-
-# 5. Git Initialization
-
-Initial repository:
-
-```text
-git init
-```
-
-Create:
-
-```text
-README.md
-.gitignore
-.env.example
-```
-
-Never commit:
-
-```text
-.env
-node_modules
-dist
-build
-coverage
-uploads
-temporary files
-logs containing secrets
-```
-
----
-
-# 6. Recommended Project Structure
-
+5. Recommended Project Structure
 ```text
 fintrack/
 │
@@ -227,88 +163,81 @@ fintrack/
 ├── README.md
 └── package.json
 ```
-
 ---
-
-# 7. Phase 1 — Project Initialization
-
-## Objective
-
-Create the project foundation and development environment.
-
-## Tasks
-
-### Repository
-
+Phase 1 — Project Initialization & Development Foundation
+Objective
+Create the repository, application structure, development tooling, and documentation foundation.
+Tasks
+Repository
 ```text
 Initialize Git
 Create repository
-Create README
+Create README.md
 Create .gitignore
 ```
-
-### Frontend
-
-Initialize React + TypeScript + Vite.
-
-### Backend
-
-Initialize Node.js + TypeScript + Express.
-
-### Tooling
-
+Frontend
+Initialize:
+```text
+React
+TypeScript
+Vite
+```
+Backend
+Initialize:
+```text
+Node.js
+TypeScript
+Express
+```
+Tooling
 Configure:
-
 ```text
 ESLint
 Prettier
 TypeScript
 ```
-
-### Environment
-
+Environment
 Create:
-
 ```text
 .env
 .env.example
 ```
-
-### Documentation
-
-Place all source-of-truth documents under:
-
+Documentation
+Create/organize:
 ```text
 docs/
 ```
-
-## Completion Criteria
-
+with all seven source-of-truth documents.
+Git Ignore
+Must ignore:
 ```text
-Frontend starts
-Backend starts
-TypeScript compiles
-Lint runs
-Formatting runs
-Environment loads
-Git ignores secrets
+.env
+node_modules
+dist
+build
+coverage
+uploads
+temporary files
+logs containing secrets
 ```
-
----
-
-# 8. Phase 2 — Backend Foundation
-
-## Objective
-
-Build a clean and scalable Express backend.
-
-## Tasks
-
-Create:
-
+Completion Criteria
 ```text
-app
-server
+[ ] Frontend starts
+[ ] Backend starts
+[ ] TypeScript compiles
+[ ] ESLint runs
+[ ] Prettier runs
+[ ] Environment configuration loads
+[ ] Git ignores secrets
+[ ] Documentation structure exists
+```
+---
+Phase 2 — Backend Architecture, API Foundation & MongoDB
+Objective
+Build the backend foundation and establish the MongoDB/Mongoose connection.
+Backend Structure
+Create:
+```text
 config
 routes
 controllers
@@ -317,270 +246,128 @@ middlewares
 validators
 models
 utils
+jobs
+seed
+types
 ```
-
+Express Foundation
 Implement:
-
 ```text
 Express app
 JSON parsing
-CORS
 Cookie parsing
+CORS
 Request logging
-Error middleware
+Central error middleware
 404 handler
 Health endpoint
 ```
-
 Health endpoint:
-
 ```text
 GET /api/health
 ```
-
-Expected:
-
+Expected response:
 ```json
 {
   "success": true,
   "message": "API is healthy"
 }
 ```
-
-## Completion Criteria
-
-```text
-Server starts
-Health endpoint works
-Errors are centralized
-Environment is validated
-MongoDB connection is isolated
-```
-
----
-
-# 9. Phase 3 — MongoDB & Mongoose Foundation
-
-## Objective
-
-Connect the backend to MongoDB.
-
-## Tasks
-
+MongoDB
 Implement:
-
 ```text
 MongoDB connection
 Mongoose configuration
-Connection error handling
+Connection failure handling
 Graceful shutdown
 ```
-
-Verify through:
-
+Development database must be inspectable through:
 ```text
 MongoDB Compass
 ```
-
-Create the first models:
-
+API Pattern
+Every feature should follow:
+```text
+Route
+ ↓
+Middleware
+ ↓
+Validation
+ ↓
+Controller
+ ↓
+Service
+ ↓
+Mongoose
+ ↓
+MongoDB
+```
+Controllers should remain thin.
+Business logic belongs in services.
+Completion Criteria
+```text
+[ ] API starts
+[ ] Health endpoint works
+[ ] MongoDB connects
+[ ] MongoDB Compass can inspect development database
+[ ] Errors are centralized
+[ ] Environment variables are validated
+[ ] Graceful shutdown works
+```
+---
+Phase 3 — Database Models, Indexes & Seed System
+Objective
+Implement the database schema defined by `DATABASESCHEMA.md`.
+Core Models
+Create the required models, including:
 ```text
 User
 Category
 Account
 Transaction
+Budget
+RecurringTransaction
+SavingsGoal
+Notification
+PasswordResetToken
+AuditLog
 ```
-
-## Completion Criteria
-
-```text
-Backend connects to MongoDB
-Collections/models are recognized
-MongoDB Compass can inspect development database
-Connection failures are handled safely
-```
-
----
-
-# 10. Phase 4 — Authentication & User Model
-
-## Objective
-
-Build secure authentication.
-
-## Tasks
-
+Additional supporting models/structures should follow the locked database schema.
+Database Requirements
 Implement:
-
 ```text
-User schema
-Register
-Login
-Logout
-Current user
-Password hashing
-JWT creation
-JWT validation
-HTTP-only cookie
-Authentication middleware
+Schema validation
+Enums
+References
+Ownership fields
+Timestamps
+Unique constraints
+Indexes
+TTL indexes where required
 ```
-
-Password rule:
-
+Important Index Areas
+Index common queries for:
 ```text
-Plain password
-      ↓
-bcrypt
-      ↓
-passwordHash
-      ↓
-MongoDB
+User email
+User role/status
+Transaction user/date
+Transaction user/category
+Transaction user/type
+Transaction user/description/search fields where appropriate
+Budget user/month/category
+Recurring transaction next occurrence
+Notifications user/read status
+Reset token expiration
+Audit log actor/date
 ```
-
-Never store plaintext passwords.
-
-## Endpoints
-
-Conceptually:
-
-```text
-POST /api/auth/register
-POST /api/auth/login
-POST /api/auth/logout
-GET  /api/auth/me
-```
-
-## Completion Criteria
-
-```text
-Registration works
-Password is bcrypt hashed
-Login works
-JWT session works
-HTTP-only cookie is used
-Protected route rejects unauthenticated users
-Logout clears session
-```
-
----
-
-# 11. Phase 5 — Forgot/Reset Password
-
-## Objective
-
-Implement secure password recovery.
-
-## Tasks
-
-Create:
-
-```text
-PasswordResetToken model
-```
-
-Implement:
-
-```text
-Forgot password
-Reset password
-Token expiration
-Token hashing
-One-time use
-```
-
-## Security
-
-Never store raw reset tokens.
-
-Flow:
-
-```text
-Raw token
- ↓
-Hash
- ↓
-MongoDB
-```
-
-## Completion Criteria
-
-```text
-Forgot password request works
-Reset link/token workflow works
-Expired tokens fail
-Used tokens fail
-Password is rehashed with bcrypt
-No account enumeration
-```
-
----
-
-# 12. Phase 6 — RBAC & Admin Foundation
-
-## Objective
-
-Implement role-based access control.
-
-Roles:
-
-```text
-USER
-ADMIN
-```
-
-## Tasks
-
-Create:
-
-```text
-requireAuth
-requireRole
-```
-
-Implement:
-
-```text
-Admin seed
-Admin route protection
-Admin user access
-Audit log model/service
-```
-
-Admin credentials come from:
-
-```text
-ADMIN_EMAIL
-ADMIN_PASSWORD
-```
-
-## Completion Criteria
-
-```text
-Admin is seeded idempotently
-User cannot access admin routes
-Admin can access admin routes
-Role checks occur on backend
-Admin actions can be audited
-```
-
----
-
-# 13. Phase 7 — Seed System Data
-
-## Objective
-
-Create predictable baseline data.
-
+Seed System
 Seed:
-
 ```text
-Admin
+Default admin
 System income categories
 System expense categories
 ```
-
 Income:
-
 ```text
 Salary
 Freelancing
@@ -588,9 +375,7 @@ Business
 Investments
 Other
 ```
-
-Expense:
-
+Expenses:
 ```text
 Food
 Transport
@@ -601,118 +386,286 @@ Entertainment
 Healthcare
 Other
 ```
-
 Seed must be idempotent.
-
-## Completion Criteria
-
-Running seed twice does not create duplicates.
-
----
-
-# 14. Phase 8 — Frontend Foundation
-
-## Objective
-
-Build the application shell.
-
-## Tasks
-
-Implement:
-
+Running it multiple times must not create duplicate admin/system categories.
+Completion Criteria
 ```text
-Global CSS/tokens
-Theme system
-Light/dark/system mode
-Router
-App shell
-Sidebar
-Header
-Mobile navigation
-Responsive container
-Reusable UI components
+[ ] Models created
+[ ] Relationships correct
+[ ] Indexes created
+[ ] Constraints implemented
+[ ] Seed command works
+[ ] Seed is idempotent
+[ ] MongoDB Compass shows expected collections
 ```
-
-Create base components:
-
+---
+Phase 4 — Authentication, Password Security & Session Management
+Objective
+Build secure user authentication.
+Features
+Implement:
+```text
+Register
+Login
+Logout
+Current user/session
+JWT authentication
+Protected routes
+bcrypt password hashing
+HTTP-only cookie
+```
+Registration Flow
+```text
+Register
+ ↓
+Validate
+ ↓
+Check email
+ ↓
+bcrypt hash password
+ ↓
+Create user
+ ↓
+Create session/JWT
+ ↓
+HTTP-only cookie
+ ↓
+Dashboard/onboarding
+```
+Login Flow
+```text
+Email + Password
+ ↓
+Find user
+ ↓
+bcrypt.compare()
+ ↓
+Generate JWT
+ ↓
+Secure HTTP-only cookie
+ ↓
+Dashboard
+```
+Use safe authentication errors:
+```text
+Invalid email or password.
+```
+Do not reveal whether an email exists.
+Logout
+```text
+Logout
+ ↓
+Invalidate/clear authentication
+ ↓
+Clear client state
+ ↓
+Login
+```
+Session Restoration
+```text
+Application starts
+ ↓
+GET /api/auth/me
+ ↓
+Valid session?
+ ├── Yes → authenticated application
+ └── No → public/authentication state
+```
+Completion Criteria
+```text
+[ ] Registration works
+[ ] Passwords are bcrypt hashed
+[ ] Plain passwords are never stored
+[ ] Login works
+[ ] JWT works
+[ ] JWT is not exposed to frontend JavaScript
+[ ] HTTP-only cookie is used
+[ ] Protected endpoints reject unauthenticated requests
+[ ] Logout works
+[ ] Session restoration works
+```
+---
+Phase 5 — Forgot/Reset Password & RBAC
+Objective
+Complete account recovery and role-based access control.
+Password Recovery
+Create secure password reset flow:
+```text
+Forgot password
+ ↓
+Generate secure reset token
+ ↓
+Hash token
+ ↓
+Store token hash + expiration
+ ↓
+Send reset link
+ ↓
+User opens link
+ ↓
+Validate token
+ ↓
+bcrypt hash new password
+ ↓
+Update password
+ ↓
+Invalidate token
+```
+Reset tokens must:
+```text
+Expire
+Be one-time use
+Never be stored in plaintext
+```
+Forgot-password responses must prevent account enumeration.
+RBAC
+Roles:
+```text
+USER
+ADMIN
+```
+Implement:
+```text
+requireAuth
+requireRole
+```
+Authorization must be enforced on the backend.
+Admin Seed
+Admin credentials come from environment variables:
+```text
+ADMIN_EMAIL
+ADMIN_PASSWORD
+```
+The seed creates the admin only if it does not already exist.
+Completion Criteria
+```text
+[ ] Forgot password works
+[ ] Reset token is hashed
+[ ] Reset token expires
+[ ] Reset token is one-time use
+[ ] New password uses bcrypt
+[ ] USER role exists
+[ ] ADMIN role exists
+[ ] Admin is seeded idempotently
+[ ] Admin routes are protected
+[ ] Normal users receive 403/forbidden behavior
+```
+---
+Phase 6 — Frontend Foundation, Design System & Application Shell
+Objective
+Build the reusable frontend foundation based on `UI/UX.md`.
+Implement
+```text
+Global styles
+Design tokens
+Typography
+Spacing
+Color system
+Light mode
+Dark mode
+System theme
+Responsive containers
+Router
+```
+Shared Components
+Create:
 ```text
 Button
+IconButton
 Input
+Textarea
 Select
+DatePicker
+CurrencyInput
+Checkbox
+Switch
+Tabs
+Dropdown
+Tooltip
 Dialog
 Drawer
 Toast
-Card
 Badge
+Card
 Table
+Pagination
+Progress
+Avatar
 Skeleton
 EmptyState
 ErrorState
-Progress
+ConfirmDialog
+ChartContainer
 ```
-
-## Completion Criteria
-
+Application Shell
+Desktop:
 ```text
-App shell works
-Desktop responsive
-Tablet responsive
-Mobile responsive
-Dark mode works
-Navigation works
-Components are reusable
+Sidebar
+Header
+Main Content
 ```
-
+Mobile:
+```text
+Mobile navigation
+Drawer/sheet where appropriate
+```
+Design Requirements
+The UI must be:
+```text
+Professional
+Clean
+Responsive
+Accessible
+Fintech-oriented
+Subtle
+Consistent
+```
+Avoid:
+```text
+Excessive gradients
+Excessive glassmorphism
+AI-style UI
+AI badges
+AI chatbot
+Decorative clutter
+```
+Completion Criteria
+```text
+[ ] App shell works
+[ ] Routing works
+[ ] Desktop layout works
+[ ] Tablet layout works
+[ ] Mobile layout works
+[ ] Light mode works
+[ ] Dark mode works
+[ ] System theme works
+[ ] Shared components exist
+```
 ---
-
-# 15. Phase 9 — Authentication Frontend
-
-## Objective
-
-Connect authentication UI to the backend.
-
-Pages:
-
+Phase 7 — Authentication Frontend, Protected Routes & User Settings
+Objective
+Connect frontend authentication to the backend and implement account settings.
+Authentication Pages
+Create:
 ```text
 Login
 Register
 Forgot Password
 Reset Password
 ```
-
 Implement:
-
 ```text
 Auth state
 Session restoration
 Protected routes
+Redirect behavior
 Logout
 Form validation
 Loading states
 Error states
 ```
-
-## Completion Criteria
-
-```text
-User can register
-User can login
-Protected dashboard works
-User can logout
-Session survives page refresh
-Invalid session redirects to login
-```
-
----
-
-# 16. Phase 10 — User Profile & Settings
-
-## Objective
-
-Implement user preferences and profile management.
-
-## Features
-
+Settings
+Implement:
 ```text
 Profile
 Phone
@@ -725,21 +678,51 @@ Notification preferences
 Change password
 Account deletion
 ```
-
-## Completion Criteria
-
-All changes persist correctly and remain user-scoped.
-
+Profile Picture
+Use the approved file upload strategy where applicable.
+Validate:
+```text
+File type
+File size
+Authorization
+```
+Account Deletion
+Flow:
+```text
+Settings
+ ↓
+Delete Account
+ ↓
+Warning
+ ↓
+Confirmation
+ ↓
+Delete/invalidate account
+ ↓
+Logout
+ ↓
+Login
+```
+Completion Criteria
+```text
+[ ] Register page works
+[ ] Login page works
+[ ] Forgot password page works
+[ ] Reset password page works
+[ ] Protected routes work
+[ ] Session survives refresh
+[ ] Logout works
+[ ] Profile updates work
+[ ] Settings persist
+[ ] Password change works
+[ ] Account deletion works
+```
 ---
-
-# 17. Phase 11 — Accounts / Wallets
-
-## Objective
-
-Implement multiple financial accounts.
-
+Phase 8 — Accounts, Wallets & Categories
+Objective
+Implement financial accounts and transaction categories.
+Accounts
 Types:
-
 ```text
 Cash
 Bank Account
@@ -747,23 +730,16 @@ Credit Card
 UPI
 Other
 ```
-
-## Backend
-
-Implement:
-
+Features:
 ```text
-Account model
-CRUD
-Ownership checks
-Status handling
+Create
+Read
+Update
+Deactivate/archive
+Ownership validation
 Balance calculation
 ```
-
-## Frontend
-
-Implement:
-
+Account UI
 ```text
 Accounts page
 Account cards
@@ -771,83 +747,104 @@ Add account
 Edit account
 Deactivate/archive
 ```
-
-## Completion Criteria
-
+Credit card balances must be presented clearly as liabilities/outstanding balances where applicable.
+Categories
+System categories:
 ```text
-User can create accounts
-User can edit accounts
-User cannot access another user's account
-Balances are calculated correctly
-Inactive accounts cannot receive prohibited new transactions
-```
+Salary
+Freelancing
+Business
+Investments
+Other
 
+Food
+Transport
+Shopping
+Bills
+Education
+Entertainment
+Healthcare
+Other
+```
+Users may create custom categories.
+System categories must be protected from unauthorized modification.
+Completion Criteria
+```text
+[ ] User can create accounts
+[ ] User can edit accounts
+[ ] User can deactivate accounts
+[ ] User cannot access another user's account
+[ ] Account balances are consistent
+[ ] System categories exist
+[ ] User custom categories work
+[ ] Category ownership is enforced
+```
 ---
-
-# 18. Phase 12 — Categories
-
-## Objective
-
-Implement system and custom categories.
-
-## Backend
-
+Phase 9 — Income & Expense Transaction Core
+Objective
+Implement the core financial transaction system.
+Transaction Fields
+Each transaction may contain:
 ```text
-Category model
-List categories
-Create custom category
-Edit custom category
-Deactivate custom category
-Ownership validation
+Amount
+Type
+Category
+Description
+Date
+Payment Method
+Account
+Notes
+Receipt reference
 ```
-
-## Frontend
-
+Types:
 ```text
-Category management
-Category selector
-System/custom indicators
+Income
+Expense
 ```
-
-## Completion Criteria
-
+Income Categories
 ```text
-System categories exist
-Users can create custom categories
-Users cannot modify another user's category
-Inactive categories cannot be used for new transactions
+Salary
+Freelancing
+Business
+Investments
+Other
 ```
-
----
-
-# 19. Phase 13 — Income & Expense Transactions
-
-## Objective
-
-Build the core financial transaction system.
-
-## Backend
-
+Expense Categories
+```text
+Food
+Transport
+Shopping
+Bills
+Education
+Entertainment
+Healthcare
+Other
+```
+Payment Methods
+```text
+Cash
+UPI
+Credit Card
+Debit Card
+Bank Transfer
+```
+Backend
 Implement:
-
 ```text
-Transaction model
 Create
 Read
 Update
 Delete
-Ownership
+Ownership checks
+Amount validation
+Type validation
 Category validation
 Account validation
-Payment method validation
 Date validation
-Amount validation
+Payment method validation
 ```
-
-## Frontend
-
+Frontend
 Implement:
-
 ```text
 Transaction list
 Add transaction
@@ -855,276 +852,339 @@ Edit transaction
 Transaction details
 Delete confirmation
 ```
-
-## Completion Criteria
-
-Users can safely manage income and expenses.
-
----
-
-# 20. Phase 14 — Transaction Search & Filters
-
-## Objective
-
-Build powerful transaction discovery.
-
-Filters:
-
-```text
-Date
-Category
-Type
-Amount
-Account
-Payment Method
-```
-
-Search:
-
-```text
-Description
-```
-
+Financial Rules
+Transactions must update the appropriate financial aggregates.
 Example:
-
+```text
+Income → income totals
+Expense → expense totals
+```
+Completion Criteria
+```text
+[ ] Income transactions work
+[ ] Expense transactions work
+[ ] CRUD works
+[ ] Ownership is enforced
+[ ] Validation works
+[ ] Account association works
+[ ] Category association works
+[ ] Payment method works
+[ ] Financial totals update correctly
+```
+---
+Phase 10 — Transaction Search, Filters, Pagination & Receipt Uploads
+Objective
+Make transaction management powerful and realistic.
+Search
+Example:
 ```text
 Amazon
+Netflix
+Salary
 ```
-
-## Backend
-
-Implement query parsing and indexed database queries.
-
-## Frontend
-
+Search should cover supported transaction text fields such as description.
+Filters
 Implement:
-
 ```text
-Search
-Filter controls
-Clear filters
-Pagination
-Sorting where required
+Date range
+Category
+Income/Expense
+Amount range
+Account
+Payment method
 ```
-
-## Completion Criteria
-
-Search/filter state remains consistent through pagination and navigation.
-
----
-
-# 21. Phase 15 — Receipt Uploads with Multer
-
-## Objective
-
-Allow users to attach receipts to transactions.
-
-## Technology
-
+Pagination
+Implement:
+```text
+Page
+Limit
+Next
+Previous
+```
+Keep filters/search state consistent through pagination.
+Receipt Uploads
+Technology:
 ```text
 Multer
 ```
-
-## Tasks
-
 Implement:
-
 ```text
 Multipart parsing
 File type validation
+MIME validation
 File size validation
-Secure file naming
+Secure naming
 Storage strategy
 Receipt metadata
 Transaction association
-Authorized file retrieval
+Authorized retrieval
+Replace/delete behavior
 ```
-
-## Supported formats
-
-Final allowed formats must follow backend configuration.
-
-Example:
-
+Example supported types:
 ```text
 JPG
 PNG
 WEBP
 PDF
 ```
-
-## Completion Criteria
-
+Final limits are controlled through backend configuration.
+Receipt Security
+Users may only access their own receipts.
+Do not expose private receipt files through unrestricted public URLs.
+Completion Criteria
 ```text
-Valid receipt uploads work
-Invalid types fail
-Oversized files fail
-Files are not publicly exposed without authorization
-Receipt metadata is stored
-Users can view their own receipts
+[ ] Search works
+[ ] Filters work
+[ ] Pagination works
+[ ] Clear filters works
+[ ] Search is user-scoped
+[ ] Multer is configured
+[ ] File type is validated
+[ ] File size is validated
+[ ] Receipt metadata is stored
+[ ] Receipt is associated with transaction
+[ ] Unauthorized receipt access is blocked
 ```
-
 ---
-
-# 22. Phase 16 — Dashboard Backend
-
-## Objective
-
-Create backend aggregation services for the main dashboard.
-
+Phase 11 — Dashboard Backend & Financial Calculation Services
+Objective
+Create centralized backend financial calculations and dashboard aggregation services.
+Core Services
+Create/reuse services such as:
+```text
+TransactionService
+AccountService
+BudgetService
+AnalyticsService
+InsightService
+ReportService
+RecurringTransactionService
+SavingsGoalService
+NotificationService
+```
+Dashboard Metrics
 Calculate:
-
 ```text
 Total Income
 Total Expenses
 Remaining Balance
 Savings Rate
 ```
-
-Also:
-
+Example:
+```text
+Income       ₹50,000
+Expenses     ₹32,500
+Balance      ₹17,500
+Savings Rate     35%
+```
+Analytics Data
+Prepare:
 ```text
 Monthly income vs expenses
 Expenses by category
 Spending trend
 Savings trend
 Payment method totals
+Account spending
 Recent transactions
 Upcoming recurring payments
 Budget status
 Goal progress
 Notifications
 ```
-
-## Completion Criteria
-
-Dashboard APIs return consistent user-scoped data.
-
----
-
-# 23. Phase 17 — Dashboard Frontend
-
-## Objective
-
-Build the main attraction of FinTrack.
-
-Implement:
-
+Calculation Rules
+Financial definitions must be centralized.
+Do not calculate the same metric differently in:
 ```text
-Summary cards
-Income/expense chart
-Category chart
+Dashboard
+Analytics
+Reports
+```
+Completion Criteria
+```text
+[ ] Dashboard summary API works
+[ ] Income calculation is correct
+[ ] Expense calculation is correct
+[ ] Balance calculation is correct
+[ ] Savings rate calculation is correct
+[ ] Category aggregation works
+[ ] Trend aggregation works
+[ ] Data is user-scoped
+[ ] Date range logic is consistent
+```
+---
+Phase 12 — Dashboard Frontend & Main Product Experience
+Objective
+Build the main attraction of FinTrack.
+Dashboard Structure
+Recommended order:
+```text
+Greeting / Period
+Financial Summary
+Income vs Expenses
+Budget / Goals / Accounts
+Category Analytics
+Spending / Savings Trends
+Insights
+Recent Transactions
+Upcoming Payments
+```
+Summary Cards
+```text
+Total Income
+Total Expenses
+Remaining Balance
+Savings Rate
+```
+Widgets
+Implement:
+```text
+Income vs Expenses chart
+Expense category chart
 Spending trend
 Savings trend
-Budget widgets
-Goal widgets
-Account widget
+Budget progress
+Savings goal progress
+Account summary
+Recent transactions
+Upcoming payments
 Insight cards
+```
+UX Requirements
+Support:
+```text
+Loading
+Skeleton
+Empty state
+Partial failure
+Retry
+Responsive charts
+Dark mode
+Accessible chart summaries
+```
+Mobile Dashboard
+Recommended order:
+```text
+Greeting
+Summary
+Balance
+Income/expense chart
+Budget
+Goals
+Insights
 Recent transactions
 Upcoming payments
 ```
-
-## Completion Criteria
-
-Dashboard is:
-
+Completion Criteria
 ```text
-Responsive
-Fast
-Visually polished
-Data-consistent
-Accessible
+[ ] Dashboard is responsive
+[ ] Summary cards work
+[ ] Charts work
+[ ] Budgets appear
+[ ] Goals appear
+[ ] Accounts appear
+[ ] Insights appear
+[ ] Recent transactions appear
+[ ] Upcoming payments appear
+[ ] Loading states work
+[ ] Empty states work
+[ ] Error states work
 ```
-
 ---
-
-# 24. Phase 18 — Monthly Budgets
-
-## Objective
-
-Implement category-based monthly budgets.
-
-## Backend
-
+Phase 13 — Monthly Budgets & Budget Alerts
+Objective
+Implement category-based monthly budgets and threshold notifications.
+Budget Fields
+Support:
 ```text
-Budget model
-Create
-Read
-Update
-Delete/disable
-Usage aggregation
-Threshold evaluation
+Category
+Month
+Year
+Limit
+Alert thresholds
 ```
-
-## Frontend
-
-```text
-Budget list
-Budget card
-Progress bar
-Budget creation
-Budget editing
-Budget warning state
-Exceeded state
-```
-
-## Completion Criteria
-
+Budget UI
 Example:
-
 ```text
 Food
+
 ₹4,000 / ₹5,000
-80%
+
+████████░░ 80%
+
+₹1,000 remaining
 ```
-
-works correctly.
-
----
-
-# 25. Phase 19 — Budget Notifications
-
-## Objective
-
-Notify users when budget thresholds are crossed.
-
-Rules:
-
+States:
+```text
+Healthy
+Warning
+Critical
+Exceeded
+```
+Budget Creation
+```text
+Select category
+ ↓
+Select month/year
+ ↓
+Set monthly limit
+ ↓
+Set thresholds
+ ↓
+Save
+```
+Prevent duplicate category/month budgets.
+Budget Calculation
+```text
+Budget limit
+ ↓
+Aggregate related expenses
+ ↓
+Calculate spent
+ ↓
+Calculate percentage
+ ↓
+Calculate remaining
+ ↓
+Determine status
+```
+Alerts
+Threshold examples:
 ```text
 50%
 75%
 90%
 100%+
 ```
-
-Thresholds may be configurable.
-
-## Flow
-
+When a threshold is crossed:
 ```text
 Transaction
  ↓
 Budget recalculation
  ↓
-Threshold crossed
+Threshold check
  ↓
-Notification created
+Notification
 ```
-
-## Completion Criteria
-
-Duplicate notification spam is prevented where appropriate.
-
+Prevent unnecessary duplicate notifications.
+Completion Criteria
+```text
+[ ] Budget CRUD works
+[ ] Duplicate budget protection works
+[ ] Usage calculation works
+[ ] Progress display works
+[ ] Warning state works
+[ ] Critical state works
+[ ] Exceeded state works
+[ ] Related transaction navigation works
+[ ] Notifications work
+```
 ---
-
-# 26. Phase 20 — Recurring Transactions
-
-## Objective
-
-Implement recurring financial events.
-
+Phase 14 — Recurring Transactions, Scheduler & Savings Goals
+Objective
+Implement recurring financial automation and savings planning.
+14.1 Recurring Transactions
 Examples:
-
 ```text
 Netflix
 Rent
@@ -1132,55 +1192,39 @@ Electricity
 Internet
 Salary
 ```
-
-## Backend
-
-Implement:
-
+Fields:
 ```text
-Recurring model
-CRUD
-Schedule logic
-Due occurrence processing
-Idempotency
-Next occurrence calculation
-Pause/resume
+Name
+Amount
+Type
+Category
+Account
+Payment Method
+Frequency
+Start Date
+Next Occurrence
+End Date
+Active status
 ```
-
-## Frontend
-
-Implement:
-
+Frequencies:
 ```text
-Recurring list
+Daily
+Weekly
+Monthly
+Yearly
+```
+Features:
+```text
 Create
 Edit
 Pause
 Resume
 Delete
-Next payment display
 ```
-
-## Completion Criteria
-
-Recurring transactions do not duplicate.
-
----
-
-# 27. Phase 21 — Recurring Transaction Job
-
-## Objective
-
-Automate due recurring transaction processing.
-
-Implement a server-side scheduler/job.
-
-Flow:
-
+Recurring Processing
+Implement a server-side scheduler/job:
 ```text
-Scheduler
- ↓
-Find due records
+Find due recurring records
  ↓
 Check active state
  ↓
@@ -1190,93 +1234,111 @@ Create transaction
  ↓
 Update nextOccurrence
 ```
-
-The implementation must safely handle restarts.
-
----
-
-# 28. Phase 22 — Savings Goals
-
-## Objective
-
-Implement savings planning.
-
-## Backend
-
+Repeated execution must not duplicate a transaction.
+14.2 Savings Goals
+Examples:
 ```text
-SavingsGoal model
-CRUD
-Contribution logic
-Progress calculation
-Completion state
+New Laptop
+Emergency Fund
+Vacation
+Car
+Education
+Phone
 ```
-
-## Frontend
-
+Fields:
 ```text
-Goal list
-Goal card
-Create goal
-Edit goal
+Goal Name
+Target Amount
+Current Amount
+Target Date
+Category
+Description
+Status
+```
+Features:
+```text
+Create
+Edit
 Add contribution
-Progress display
+Pause
+Complete
 ```
-
-## Completion Criteria
-
+Goal contribution:
 ```text
-Target
-Current
-Progress
-Remaining
-Target date
+Goal
+ ↓
+Add contribution
+ ↓
+Amount
+ ↓
+Optional account
+ ↓
+Date
+ ↓
+Note
+ ↓
+Update current amount
+ ↓
+Recalculate progress
 ```
-
-are displayed accurately.
-
+Completion:
+```text
+currentAmount >= targetAmount
+ ↓
+Status = COMPLETED
+```
+Completion Criteria
+```text
+[ ] Recurring CRUD works
+[ ] Scheduler works
+[ ] Idempotency works
+[ ] Pause/resume works
+[ ] Next occurrence is correct
+[ ] Savings goals work
+[ ] Contributions work
+[ ] Goal progress is correct
+[ ] Goal completion works
+```
 ---
-
-# 29. Phase 23 — Notifications
-
-## Objective
-
-Create the persistent notification center.
-
+Phase 15 — Notifications, Analytics & Deterministic Financial Insights
+Objective
+Build the intelligence layer without using AI.
+15.1 Notifications
 Types:
-
 ```text
 Budget alert
 Budget exceeded
 Recurring payment
-Goal milestone
+Savings goal milestone
 Financial insight
 System
 ```
-
-## Frontend
-
+Implement:
 ```text
-Header badge
-Notification dropdown
-Notifications page
-Read/unread
-Mark all read
+Notification model
+Create notification
+Unread count
+Mark as read
+Mark all as read
+Delete
+Notification preferences
 ```
-
-## Completion Criteria
-
-Notifications are user-scoped and persistent.
-
----
-
-# 30. Phase 24 — Analytics Backend
-
-## Objective
-
-Build reusable financial analytics services.
-
-Implement aggregation for:
-
+Header:
+```text
+🔔 unread count
+```
+Notification Flow
+```text
+Event
+ ↓
+Check notification preference
+ ↓
+Create notification if enabled
+ ↓
+Display in notification center
+```
+15.2 Analytics
+Implement:
 ```text
 Income
 Expenses
@@ -1287,21 +1349,15 @@ Payment method spending
 Account spending
 Monthly trends
 ```
-
-## Completion Criteria
-
-Analytics support date ranges and appropriate filters.
-
----
-
-# 31. Phase 25 — Analytics Frontend
-
-## Objective
-
-Build detailed analytics UI.
-
+Filters:
+```text
+Date range
+Account
+Category
+Transaction type
+Payment method
+```
 Charts:
-
 ```text
 Income vs Expenses
 Expense Categories
@@ -1310,131 +1366,113 @@ Savings Trend
 Payment Methods
 Account Spending
 ```
-
-Add:
-
-```text
-Date range
-Category filter
-Account filter
-Type filter
-```
-
----
-
-# 32. Phase 26 — Deterministic Financial Insights
-
-## Objective
-
-Build the internal insight engine without AI.
-
-No:
-
+15.3 Deterministic Financial Insights
+No external AI service is allowed.
+Do not integrate:
 ```text
 OpenAI
 Gemini
 Claude
 Other AI APIs
 AI API keys
+AI chatbot
 ```
-
-Use internal rules.
-
+Instead:
+```text
+MongoDB data
+ ↓
+Aggregation
+ ↓
+Analytics service
+ ↓
+Deterministic rules
+ ↓
+Insight
+```
 Example:
-
 ```text
-if currentFoodSpend > previousFoodSpend * 1.18
-    generate food spending increase insight
+currentFoodSpend > previousFoodSpend * 1.18
 ```
-
+Then:
+```text
+Your food expenses increased by 18%
+compared with last month.
+```
 Other rules:
-
 ```text
-High category concentration
-Budget threshold
-Savings improvement
-Savings decline
-Unusual spending increase
-Goal proximity
+Category represents a high percentage of spending
+Budget reaches threshold
+Budget exceeded
+Savings increased
+Savings decreased
+Goal is near completion
+Spending increased significantly
 ```
-
-## Completion Criteria
-
-Insights are:
-
+Insights must be:
 ```text
 Deterministic
 Explainable
+Repeatable
 Testable
 User-scoped
 ```
-
+Completion Criteria
+```text
+[ ] Notifications work
+[ ] Unread count works
+[ ] Read/unread works
+[ ] Analytics filters work
+[ ] Charts use correct data
+[ ] Insight rules work
+[ ] No AI API exists
+[ ] Insight tests exist
+```
 ---
-
-# 33. Phase 27 — Financial Calendar
-
-## Objective
-
-Create calendar-based financial visibility.
-
-Events:
-
+Phase 16 — Calendar, Reports & Data Export
+Objective
+Provide financial planning visibility and export capabilities.
+16.1 Financial Calendar
+Display:
 ```text
 Recurring payments
 Goal deadlines
 Budget periods
 Other supported financial events
 ```
-
-Implement:
-
+Flow:
 ```text
-Month navigation
-Event list
-Event details
-Related resource navigation
+Calendar
+ ↓
+Select month
+ ↓
+Load events
+ ↓
+Display
+ ↓
+Select event
+ ↓
+Open related resource
 ```
-
----
-
-# 34. Phase 28 — Reports
-
-## Objective
-
-Generate financial reports.
-
-Formats:
-
+16.2 PDF Reports
+Monthly report example:
 ```text
-PDF
-CSV
+August 2026 Financial Report
+
+Income       ₹50,000
+Expenses     ₹32,500
+Savings      ₹17,500
+Savings Rate     35%
+
+Top Category
+Food         ₹7,200
+
+Top Payment Method
+UPI          ₹12,400
 ```
-
-Monthly report:
-
-```text
-Income
-Expenses
-Savings
-Savings Rate
-Top Categories
-Payment Methods
-```
-
-## Completion Criteria
-
-Report numbers match dashboard/analytics definitions.
-
----
-
-# 35. Phase 29 — User Data Export
-
-## Objective
-
-Allow users to export their own financial data.
-
-Include appropriate:
-
+16.3 CSV Export
+Export relevant transaction/report data.
+16.4 User Data Export
+May include:
 ```text
 Transactions
 Accounts
@@ -1443,73 +1481,81 @@ Categories
 Recurring transactions
 Savings goals
 ```
-
-Never export:
-
+Must not include:
 ```text
 passwordHash
+JWT
 reset tokens
-JWTs
 secrets
 ```
-
----
-
-# 36. Phase 30 — Admin Dashboard
-
-## Objective
-
-Build administrative visibility.
-
-Metrics:
-
-```text
-Total users
-Active users
-Transaction volume
-Financial activity
-```
-
-Admin pages:
-
+Report Consistency
+Report numbers must use the same backend calculation definitions as:
 ```text
 Dashboard
+Analytics
+```
+Completion Criteria
+```text
+[ ] Calendar works
+[ ] Events are correct
+[ ] PDF generation works
+[ ] CSV generation works
+[ ] Data export works
+[ ] Sensitive fields are excluded
+[ ] Report values match dashboard/analytics
+```
+---
+Phase 17 — Admin Dashboard, User Management, Categories & Audit Logs
+Objective
+Complete the administration platform.
+Admin Dashboard
+Metrics:
+```text
+Total Users
+Active Users
+Transaction Volume
+Financial Activity
+```
+Admin Navigation
+```text
+Admin Dashboard
 Users
 Categories
 Audit Logs
 System Settings
 ```
-
----
-
-# 37. Phase 31 — Admin User Management
-
-## Objective
-
-Implement user administration.
-
+User Management
 Features:
-
 ```text
 Search users
-View safe profile information
+View safe user information
 Activate
 Deactivate
 Change role
 ```
-
-All sensitive administrative actions must be audited.
-
----
-
-# 38. Phase 32 — Admin Audit Logs
-
-## Objective
-
-Record important administrative operations.
-
-Log:
-
+Sensitive credentials must never be exposed.
+Role Change
+```text
+Admin
+ ↓
+User details
+ ↓
+Change role
+ ↓
+Confirm
+ ↓
+Backend authorization
+ ↓
+Update role
+ ↓
+Audit log
+```
+Category Management
+Admins may manage system categories according to approved product rules.
+Historical transaction integrity must be preserved.
+Avoid destructive hard deletes of categories referenced by historical transactions.
+Audit Logs
+Record:
 ```text
 Actor
 Action
@@ -1517,143 +1563,157 @@ Target
 Timestamp
 Safe metadata
 ```
-
-Never log:
-
+Never record:
 ```text
 Passwords
 JWTs
 Reset tokens
 Secrets
 ```
-
----
-
-# 39. Phase 33 — Admin System Settings
-
-## Objective
-
-Provide controlled system configuration.
-
+Audit logs are read-only through the normal admin UI.
+System Settings
 Only expose explicitly approved settings.
-
 Changes must:
-
 ```text
 Validate
 Persist
 Audit
 ```
-
+Completion Criteria
+```text
+[ ] Admin dashboard works
+[ ] User search works
+[ ] User activation/deactivation works
+[ ] Role changes work
+[ ] Category administration works
+[ ] Audit logs work
+[ ] Sensitive fields are protected
+[ ] Unauthorized users cannot access admin
+```
 ---
-
-# 40. Phase 34 — Frontend Polish
-
-## Objective
-
-Bring the UI to production-quality visual consistency.
-
+Phase 18 — UI Polish, Accessibility, Responsive QA & Performance
+Objective
+Bring the entire application to portfolio-level and production-quality UX.
+Visual Review
 Review:
-
 ```text
 Typography
 Spacing
 Colors
-Dark mode
-Responsive layouts
+Borders
+Shadows
+Buttons
 Cards
-Tables
 Forms
+Tables
 Charts
+Navigation
 Dialogs
 Toasts
-Navigation
 ```
-
 Remove:
-
 ```text
-Placeholder text
-Inconsistent styles
-Unused components
-Duplicate UI patterns
-Temporary debugging UI
+Placeholder content
+Debug UI
+Inconsistent styling
+Duplicate components
+Unused styles
+Temporary text
 ```
-
----
-
-# 41. Phase 35 — Animation & Interaction Polish
-
-## Objective
-
-Add subtle motion without making the application feel artificial.
-
-Add:
-
-```text
-Page transitions
-Dialog transitions
-Drawer transitions
-Progress animation
-Chart entrance animation
-Toast animation
-```
-
-Respect:
-
-```text
-prefers-reduced-motion
-```
-
-Do not add excessive:
-
-```text
-glows
-parallax
-3D effects
-floating gradients
-```
-
----
-
-# 42. Phase 36 — Accessibility
-
-## Objective
-
-Make the application accessible.
-
+Responsive QA
 Test:
-
 ```text
-Keyboard navigation
-Focus states
-Screen readers
-Labels
+Small mobile
+Large mobile
+Tablet
+Laptop
+Desktop
+Large desktop
+```
+Verify:
+```text
+Dashboard
+Transactions
 Forms
-Dialogs
 Tables
 Charts
+Dialogs
+Navigation
+Admin
+Settings
+```
+Accessibility
+Verify:
+```text
+Keyboard navigation
+Focus visibility
+Screen-reader labels
+Semantic HTML
+Form labels
+Dialog focus management
+Table semantics
+Chart text summaries
 Color contrast
 Reduced motion
 ```
-
-Fix all critical accessibility issues.
-
+Motion
+Use subtle transitions for:
+```text
+Dialogs
+Drawers
+Toasts
+Progress
+Charts
+Page transitions
+```
+Respect:
+```text
+prefers-reduced-motion
+```
+Avoid:
+```text
+Excessive animation
+Glows
+Parallax
+3D effects
+Decorative motion
+```
+Performance
+Review:
+```text
+Database queries
+Indexes
+Aggregation performance
+API payload sizes
+Frontend bundle
+Image sizes
+Chart rendering
+Pagination
+Search debounce
+Lazy loading
+```
+Optimize measured bottlenecks.
+Completion Criteria
+```text
+[ ] UI is visually consistent
+[ ] Responsive behavior is correct
+[ ] Accessibility checks pass
+[ ] Reduced motion works
+[ ] No obvious performance bottlenecks
+[ ] No placeholder/debug UI remains
+```
 ---
-
-# 43. Phase 37 — Security Hardening
-
-## Objective
-
-Perform application security review.
-
+Phase 19 — Security Hardening, Testing & Production Readiness
+Objective
+Perform full security, data integrity, functional, integration, and end-to-end validation.
+19.1 Security
 Verify:
-
 ```text
 JWT security
 HTTP-only cookies
-CSRF strategy
+Secure cookie settings
 CORS
+CSRF strategy
 Rate limiting
 Input validation
 Authorization
@@ -1665,69 +1725,45 @@ Secure headers
 Password hashing
 Reset token security
 ```
-
 Verify no secret appears in:
-
 ```text
 Git
 Frontend bundle
+API responses
 Logs
-API response
-Error response
+Error messages
 ```
-
----
-
-# 44. Phase 38 — Backend Testing
-
-## Objective
-
-Test backend behavior.
-
+19.2 Backend Testing
 Unit tests:
-
 ```text
 Validation
 Business logic
-Insight rules
-Date calculations
 Budget calculations
 Savings calculations
+Insight rules
+Date calculations
 ```
-
 Integration tests:
-
 ```text
-Auth
+Authentication
 Transactions
-Budgets
 Accounts
+Budgets
 Goals
 Recurring
 Uploads
 Reports
 Admin
 ```
-
 Security tests:
-
 ```text
 Unauthorized access
 Cross-user access
 Role escalation
 Invalid tokens
 ```
-
----
-
-# 45. Phase 39 — Frontend Testing
-
-## Objective
-
-Test important user journeys.
-
+19.3 Frontend Testing
 Test:
-
 ```text
 Login
 Register
@@ -1744,586 +1780,426 @@ Reports
 Settings
 Admin
 ```
-
-Test responsive behavior.
-
----
-
-# 46. Phase 40 — End-to-End Testing
-
-## Objective
-
-Verify complete workflows across frontend/backend/database.
-
-Critical E2E flows:
-
-### Authentication
-
+19.4 End-to-End Testing
+Critical flows:
+Authentication
 ```text
-Register → Login → Dashboard → Logout
+Register
+ ↓
+Login
+ ↓
+Dashboard
+ ↓
+Logout
 ```
-
-### Transaction
-
+Transaction
 ```text
-Login → Add Expense → Dashboard updates
+Login
+ ↓
+Add expense
+ ↓
+Dashboard updates
 ```
-
-### Budget
-
+Budget
 ```text
-Create Budget → Add Expense → Budget Usage Changes
+Create budget
+ ↓
+Add expense
+ ↓
+Budget usage changes
+ ↓
+Alert when threshold is reached
 ```
-
-### Recurring
-
+Recurring
 ```text
-Create Recurring → Process Occurrence → Transaction Created
+Create recurring
+ ↓
+Process occurrence
+ ↓
+Transaction created once
 ```
-
-### Goal
-
+Goal
 ```text
-Create Goal → Add Contribution → Progress Updates
+Create goal
+ ↓
+Add contribution
+ ↓
+Progress updates
 ```
-
-### Receipt
-
+Receipt
 ```text
-Create Transaction → Upload Receipt → View Receipt
+Create transaction
+ ↓
+Upload receipt
+ ↓
+View receipt
 ```
-
-### Admin
-
+Admin
 ```text
-Admin Login → User Management → Audit Log
+Admin login
+ ↓
+User management
+ ↓
+Administrative action
+ ↓
+Audit log
 ```
-
----
-
-# 47. Phase 41 — Performance Optimization
-
-## Objective
-
-Improve real-world performance.
-
-Review:
-
+19.5 Financial Integrity Testing
+Verify:
 ```text
-Database indexes
-Aggregation queries
-API response sizes
-Frontend bundle
-Image sizes
-Chart rendering
-Pagination
-Search debounce
-Lazy loading
+Income increases income totals
+Expense increases expense totals
+Deleting expense decreases expense totals
+Budget usage changes correctly
+Account balance changes correctly
+Savings rate changes correctly
+Analytics reflect transaction changes
+Reports reflect transaction changes
 ```
-
-Avoid premature optimization.
-
-Optimize measured bottlenecks.
-
----
-
-# 48. Phase 42 — Database Review
-
-## Objective
-
-Validate the database against the locked schema.
-
-Review:
-
+19.6 Recurring Integrity Testing
+Verify:
+```text
+Due transaction creates exactly one transaction
+Repeated job execution does not duplicate
+Paused item does not process
+Expired item stops
+Next occurrence is correct
+```
+19.7 File Security Testing
+Test:
+```text
+Invalid extension
+Invalid MIME
+Oversized file
+Malformed file
+Unauthorized access
+Path traversal attempt
+Unexpected filename
+```
+19.8 Database Review
+Inspect through MongoDB Compass:
 ```text
 Collections
 Indexes
-Unique constraints
-Ownership
-Validation
+Relationships
+Constraints
 Seed data
-TTL indexes
-Query performance
+Sample records
 ```
-
-Inspect through MongoDB Compass.
-
+Completion Criteria
+```text
+[ ] Critical tests pass
+[ ] Security tests pass
+[ ] Ownership tests pass
+[ ] RBAC tests pass
+[ ] Financial integrity tests pass
+[ ] Upload security tests pass
+[ ] E2E flows pass
+[ ] No critical/high security defects remain
+```
 ---
-
-# 49. Phase 43 — Production Configuration
-
-## Objective
-
-Prepare deployment configuration.
-
-Set production environment values:
-
+Phase 20 — Production Deployment, Smoke Test, Documentation & Release
+Objective
+Deploy FinTrack safely and verify the production system.
+Production Configuration
+Set production environment variables:
 ```text
 NODE_ENV=production
 MONGO_URI=...
 JWT_SECRET=...
 CLIENT_URL=...
 ```
-
 Configure:
-
 ```text
-Secure cookies
 HTTPS
+Secure cookies
 CORS
-Logging
+Production MongoDB
 Upload storage
-Database
-Email/reset-password infrastructure
+Email/reset-password service
+Logging
+Error monitoring
 ```
-
----
-
-# 50. Phase 44 — Deployment Preparation
-
-## Objective
-
-Prepare frontend and backend builds.
-
+Build
 Frontend:
-
 ```text
 npm run build
 ```
-
 Backend:
-
 ```text
 npm run build
 ```
-
 Verify:
-
 ```text
 Environment variables
-Build output
 API URL
-Database connectivity
 Static assets
 Uploads
+Database connectivity
 ```
-
----
-
-# 51. Phase 45 — Production Smoke Test
-
-Before release:
-
+Deployment
+Deploy:
 ```text
-Open application
-Login
-Register test account
-Create transaction
-Edit transaction
-Delete transaction
-Create budget
-Create goal
-Create recurring transaction
-Upload receipt
-Generate report
-Check notifications
-Check admin
+Frontend
+Backend
+Database
+File storage
 ```
-
----
-
-# 52. Phase 46 — Documentation Finalization
-
-Update:
-
+according to the selected hosting infrastructure.
+Production Smoke Test
+Immediately after deployment:
+```text
+[ ] Health endpoint
+[ ] Registration
+[ ] Login
+[ ] Logout
+[ ] Dashboard
+[ ] Add transaction
+[ ] Edit transaction
+[ ] Delete transaction
+[ ] Search/filter
+[ ] Budget
+[ ] Goal
+[ ] Recurring transaction
+[ ] Receipt upload
+[ ] Notifications
+[ ] Analytics
+[ ] PDF report
+[ ] CSV export
+[ ] User settings
+[ ] Admin login
+[ ] Admin user management
+[ ] Audit logs
+```
+Documentation
+Finalize:
 ```text
 README.md
-API documentation
-Environment documentation
-Setup instructions
+Environment setup
+Local development setup
+MongoDB setup
+MongoDB Compass instructions
 Seed instructions
+API documentation
 Deployment instructions
 ```
-
-Confirm all source-of-truth documents are synchronized.
-
----
-
-# 53. Phase 47 — Final QA
-
-Final QA categories:
-
+Ensure all source-of-truth documents are synchronized:
 ```text
-Functional
-Visual
-Responsive
-Accessibility
-Security
-Performance
-Data integrity
-Authentication
-Authorization
-File uploads
-Reports
-Admin
+PRD.md
+TRD.md
+ARCHITECTURE.md
+DATABASESCHEMA.md
+UI/UX.md
+WEBFLOW.md
+IMPLEMENTATION.md
 ```
-
-No known critical/high severity defects should remain.
-
----
-
-# 54. Phase 48 — Release
-
-Release checklist:
-
-```text
-Production environment configured
-Database ready
-Indexes created
-Admin seeded
-Frontend deployed
-Backend deployed
-HTTPS enabled
-Cookies secure
-Uploads configured
-Reports tested
-Email/reset password tested
-Monitoring/logging available
-Backup strategy confirmed
-```
-
----
-
-# 55. Phase 49 — Post-Release Verification
-
-After deployment:
-
-```text
-Health endpoint
-Login
-Dashboard
-Database
-Uploads
-Reports
-Notifications
-Admin
-```
-
+Post-Release Verification
 Monitor:
-
 ```text
-Error rate
-API latency
+API errors
+Authentication failures
 Database errors
 Upload failures
-Authentication failures
+Slow requests
+Recurring job failures
+Report generation failures
 ```
-
+Completion Criteria
+```text
+[ ] Production environment configured
+[ ] Database ready
+[ ] Indexes verified
+[ ] Admin seeded
+[ ] Frontend deployed
+[ ] Backend deployed
+[ ] HTTPS enabled
+[ ] Secure cookies enabled
+[ ] Uploads work
+[ ] Reports work
+[ ] Authentication works
+[ ] Admin works
+[ ] Smoke test passes
+[ ] Documentation is complete
+[ ] No critical release blockers remain
+```
 ---
-
-# 56. Implementation Dependency Graph
-
+6. Phase Dependency Map
+The 20 phases are intentionally ordered around technical dependencies.
 ```text
 Phase 1
-  ↓
+Project Foundation
+    ↓
 Phase 2
-  ↓
+Backend + MongoDB
+    ↓
 Phase 3
-  ↓
+Database + Seed
+    ↓
 Phase 4
-  ↓
+Authentication
+    ↓
 Phase 5
-  ↓
+Password Recovery + RBAC
+    ↓
 Phase 6
-  ↓
+Frontend Foundation
+    ↓
 Phase 7
-  ↓
+Frontend Auth + Settings
+    ↓
 Phase 8
-  ↓
+Accounts + Categories
+    ↓
 Phase 9
-  ↓
+Transactions
+    ↓
 Phase 10
-  ↓
+Search + Filters + Receipts
+    ↓
 Phase 11
-  ↓
+Financial Services + Dashboard Backend
+    ↓
 Phase 12
-  ↓
+Dashboard Frontend
+    ↓
 Phase 13
-  ↓
+Budgets + Alerts
+    ↓
 Phase 14
-  ↓
+Recurring + Goals
+    ↓
 Phase 15
-  ↓
+Notifications + Analytics + Insights
+    ↓
 Phase 16
-  ↓
+Calendar + Reports + Export
+    ↓
 Phase 17
-  ↓
+Admin Platform
+    ↓
 Phase 18
-  ↓
+UI/UX + Accessibility + Performance
+    ↓
 Phase 19
-  ↓
+Security + Testing
+    ↓
 Phase 20
-  ↓
-Phase 21
-  ↓
-Phase 22
-  ↓
-Phase 23
-  ↓
-Phase 24
-  ↓
-Phase 25
-  ↓
-Phase 26
-  ↓
-Phase 27
-  ↓
-Phase 28
-  ↓
-Phase 29
-  ↓
-Phase 30
-  ↓
-Phase 31
-  ↓
-Phase 32
-  ↓
-Phase 33
-  ↓
-Phase 34
-  ↓
-Phase 35
-  ↓
-Phase 36
-  ↓
-Phase 37
-  ↓
-Phase 38
-  ↓
-Phase 39
-  ↓
-Phase 40
-  ↓
-Phase 41
-  ↓
-Phase 42
-  ↓
-Phase 43
-  ↓
-Phase 44
-  ↓
-Phase 45
-  ↓
-Phase 46
-  ↓
-Phase 47
-  ↓
-Phase 48
-  ↓
-Phase 49
+Production Release
 ```
-
-Some phases may be developed in parallel by separate developers, but dependencies must be respected.
-
+Some work can happen in parallel inside a phase, but dependencies must not be violated.
 ---
-
-# 57. Recommended Development Order by Milestone
-
-## Milestone 1 — Foundation
-
+7. Recommended Milestones
+Milestone 1 — Technical Foundation
 ```text
 Phase 1
 Phase 2
 Phase 3
 ```
-
 Result:
-
 ```text
-Working full-stack skeleton
-```
-
----
-
-## Milestone 2 — Authentication
-
-```text
-Phase 4
-Phase 5
-Phase 6
-Phase 7
-Phase 8
-Phase 9
-```
-
-Result:
-
-```text
-Secure authentication + RBAC
-```
-
----
-
-## Milestone 3 — Financial Core
-
-```text
-Phase 10
-Phase 11
-Phase 12
-Phase 13
-Phase 14
-Phase 15
-```
-
-Result:
-
-```text
-Users can securely track money.
-```
-
----
-
-## Milestone 4 — Dashboard & Budgeting
-
-```text
-Phase 16
-Phase 17
-Phase 18
-Phase 19
-```
-
-Result:
-
-```text
-Core financial dashboard
+Working full-stack foundation
 +
-Budget management
+MongoDB
++
+Seed system
 ```
-
 ---
-
-## Milestone 5 — Planning
-
+Milestone 2 — Secure Application Access
 ```text
-Phase 20
-Phase 21
-Phase 22
-Phase 23
+Phase 4
+Phase 5
+Phase 6
+Phase 7
 ```
-
 Result:
-
+```text
+Authentication
++
+RBAC
++
+Responsive application shell
++
+User settings
+```
+---
+Milestone 3 — Financial Core
+```text
+Phase 8
+Phase 9
+Phase 10
+```
+Result:
+```text
+Accounts
+Categories
+Transactions
+Search
+Filters
+Receipts
+```
+---
+Milestone 4 — Main Financial Experience
+```text
+Phase 11
+Phase 12
+Phase 13
+```
+Result:
+```text
+Dashboard
++
+Financial calculations
++
+Monthly budgets
++
+Budget alerts
+```
+---
+Milestone 5 — Planning & Tracking
+```text
+Phase 14
+Phase 15
+```
+Result:
 ```text
 Recurring transactions
 Savings goals
 Notifications
-```
-
----
-
-## Milestone 6 — Intelligence Without AI
-
-```text
-Phase 24
-Phase 25
-Phase 26
-Phase 27
-```
-
-Result:
-
-```text
 Analytics
 Deterministic insights
-Financial calendar
 ```
-
 ---
-
-## Milestone 7 — Reporting
-
+Milestone 6 — Reporting & Administration
 ```text
-Phase 28
-Phase 29
+Phase 16
+Phase 17
 ```
-
 Result:
-
 ```text
-PDF
-CSV
-Data export
-```
-
----
-
-## Milestone 8 — Administration
-
-```text
-Phase 30
-Phase 31
-Phase 32
-Phase 33
-```
-
-Result:
-
-```text
+Calendar
+Reports
+Exports
 Admin platform
-RBAC
-Auditability
+Audit logs
 ```
-
 ---
-
-## Milestone 9 — Production Quality
-
+Milestone 7 — Production Quality
 ```text
-Phase 34
-Phase 35
-Phase 36
-Phase 37
-Phase 38
-Phase 39
-Phase 40
-Phase 41
-Phase 42
+Phase 18
+Phase 19
+Phase 20
 ```
-
 Result:
-
 ```text
-Production-quality application
+Polished
+Accessible
+Secure
+Tested
+Production-ready
 ```
-
 ---
-
-## Milestone 10 — Release
-
-```text
-Phase 43
-Phase 44
-Phase 45
-Phase 46
-Phase 47
-Phase 48
-Phase 49
-```
-
-Result:
-
-```text
-Production deployment
-```
-
----
-
-# 58. Definition of Done
-
-A phase is not complete merely because the code works locally.
-
-A phase is complete when:
-
+8. Definition of Done
+A phase is complete only when the relevant work satisfies:
 ```text
 Feature implemented
 +
@@ -2331,140 +2207,117 @@ Validation implemented
 +
 Authorization implemented
 +
-Error handling implemented
+Ownership checks implemented
 +
-Responsive UI implemented where applicable
+Error handling implemented
 +
 Loading/empty/error states implemented
 +
-Tests written
+Responsive UI implemented
 +
-Lint/type checks pass
+Tests implemented
++
+TypeScript passes
++
+Lint passes
 +
 Documentation remains consistent
 ```
-
 ---
-
-# 59. Financial Feature Definition of Done
-
+9. Financial Feature Definition of Done
 Every financial feature must verify:
-
 ```text
 Correct amount
 Correct ownership
 Correct date
 Correct category
 Correct account
-Correct calculations
+Correct transaction type
+Correct calculation
 Correct dashboard impact
 Correct analytics impact
 Correct report impact
 ```
-
 ---
-
-# 60. Authentication Definition of Done
-
+10. Authentication Definition of Done
 Authentication is complete only when:
-
 ```text
 Registration
 Login
 Logout
-Session restore
+Session restoration
 Protected routes
 Password hashing
 Forgot password
 Reset password
 RBAC
 ```
-
-are all tested.
-
+have been implemented and tested.
 ---
-
-# 61. Authorization Definition of Done
-
-Every protected backend endpoint must answer:
-
+11. Authorization Definition of Done
+Every protected backend endpoint must determine:
 ```text
 Who is the user?
+ ↓
 Is the user authenticated?
+ ↓
 Does the user have the required role?
+ ↓
 Does the requested resource belong to the user?
+ ↓
+Is the requested action allowed?
 ```
-
+Frontend route guards are not a substitute for backend authorization.
 ---
-
-# 62. Upload Definition of Done
-
-Receipt uploads are complete only when:
-
+12. Upload Definition of Done
+Receipt upload is complete only when:
 ```text
 Multer configured
-Type validated
-Size validated
+File type validated
+MIME validated
+File size validated
 File safely stored
 Metadata stored
-Authorization enforced
-Unauthorized retrieval prevented
-Delete/replace behavior defined
+Ownership enforced
+Authorized retrieval implemented
+Replace/delete behavior defined
 ```
-
 ---
-
-# 63. Reporting Definition of Done
-
+13. Reporting Definition of Done
 Reports are complete only when:
-
 ```text
-Dashboard numbers
-Analytics numbers
-Report numbers
+Dashboard values
+Analytics values
+Report values
 ```
-
-use consistent backend financial definitions.
-
+are generated from consistent backend financial definitions.
 ---
-
-# 64. Admin Definition of Done
-
+14. Admin Definition of Done
 Admin functionality is complete only when:
-
 ```text
 Admin seeded
 RBAC enforced
 User management works
+Category management works
 Audit logs work
 Sensitive fields protected
 Unauthorized users blocked
 ```
-
 ---
-
-# 65. Testing Gate
-
-Before moving to the next major milestone:
-
+15. Testing Gate
+Before moving from one major milestone to another:
 ```text
-TypeScript passes
-Lint passes
-Unit tests pass
-Integration tests pass
-Critical E2E flows pass
+[ ] TypeScript passes
+[ ] Lint passes
+[ ] Unit tests pass
+[ ] Integration tests pass
+[ ] Critical E2E flows pass
+[ ] No critical security issue remains
 ```
-
-No known critical security issue may remain.
-
 ---
-
-# 66. Git Commit Strategy
-
+16. Git Commit Strategy
 Use meaningful commits.
-
 Examples:
-
 ```text
 feat(auth): add JWT authentication
 feat(transactions): add transaction CRUD
@@ -2476,9 +2329,7 @@ fix(transactions): validate account ownership
 refactor(analytics): extract aggregation service
 test(auth): add reset password coverage
 ```
-
-Avoid commits such as:
-
+Avoid:
 ```text
 update
 changes
@@ -2486,37 +2337,27 @@ final
 done
 test
 ```
-
 ---
-
-# 67. Branching Strategy
-
+17. Branching Strategy
 Recommended:
-
 ```text
 main
 develop
 feature/*
 fix/*
 ```
-
-Example:
-
+Examples:
 ```text
 feature/authentication
 feature/transactions
 feature/budgets
 feature/analytics
+feature/admin
 ```
-
-Pull requests should be reviewed before merging when working in a team.
-
+Pull requests should be reviewed before merging in team development.
 ---
-
-# 68. Code Review Checklist
-
-Review:
-
+18. Code Review Checklist
+Review every important change for:
 ```text
 Security
 Authorization
@@ -2531,24 +2372,177 @@ Duplication
 UI consistency
 Responsive behavior
 ```
-
 ---
+19. API Development Standard
+Every API feature should follow:
+```text
+Route
+ ↓
+Authentication middleware
+ ↓
+Role middleware if required
+ ↓
+Validation
+ ↓
+Controller
+ ↓
+Service
+ ↓
+Database/model
+ ↓
+Safe response
+```
+Do not place complex business logic directly inside route definitions.
+---
+20. Frontend Feature Standard
+Each major frontend feature should have:
+```text
+Page
+Components
+API service
+Types
+Hooks/state
+Validation
+Loading state
+Error state
+Empty state
+Responsive behavior
+```
+---
+21. Shared Financial Utility Standard
+Centralize:
+```text
+Currency formatting
+Percentage formatting
+Date formatting
+Date range calculations
+Financial period calculations
+Savings rate
+Budget percentage
+Goal percentage
+Trend comparison
+```
+Avoid duplicate formulas across components.
+---
+22. Mutation Refresh Strategy
+After a financial mutation, refresh/invalidate only affected data.
+Example:
+```text
+Create Expense
+ ↓
+Transactions
+Dashboard
+Budgets
+Analytics
+Accounts
+Notifications
+```
+Do not unnecessarily reload the entire application.
+---
+23. Security Test Matrix
+At minimum test:
+```text
+User A cannot read User B transaction
+User A cannot edit User B transaction
+User A cannot delete User B transaction
+User cannot access admin routes
+User cannot modify protected system category
+User cannot access another user's receipt
+User cannot change role without authorization
+Expired JWT is rejected
+Invalid reset token is rejected
+Used reset token is rejected
+```
+---
+24. Financial Integrity Test Matrix
+Test:
+```text
+Income added
+Income edited
+Income deleted
 
-# 69. No-AI Implementation Rule
+Expense added
+Expense edited
+Expense deleted
 
-The following are explicitly prohibited for this project:
+Budget created
+Budget crossed
+Budget exceeded
 
+Goal created
+Goal contribution
+Goal completion
+
+Recurring occurrence
+Recurring duplicate prevention
+
+Dashboard aggregation
+Analytics aggregation
+Report aggregation
+```
+---
+25. Responsive QA Matrix
+Test at minimum:
+```text
+Small mobile
+Large mobile
+Tablet
+Laptop
+Desktop
+Large desktop
+```
+Verify:
+```text
+Navigation
+Dashboard
+Transaction table/list
+Forms
+Charts
+Dialogs
+Cards
+Reports
+Settings
+Admin
+```
+---
+26. Accessibility QA Matrix
+Check:
+```text
+Keyboard navigation
+Focus visibility
+Screen reader labels
+Semantic HTML
+Form labels
+Dialog focus
+Table semantics
+Chart summaries
+Color contrast
+Reduced motion
+Touch target sizes
+```
+---
+27. Browser QA
+Test supported modern browsers according to deployment target.
+At minimum:
+```text
+Chrome
+Edge
+Firefox
+Safari where applicable
+```
+---
+28. No-AI Implementation Rule
+The following are explicitly prohibited:
 ```text
 AI API integrations
 AI API keys
 AI chatbot
+AI financial advisor
 AI-generated financial recommendations
 LLM-based expense classification
-External AI financial analysis
+External AI-generated insights
 ```
-
-Financial intelligence must use:
-
+All intelligence must use:
 ```text
 MongoDB data
 +
@@ -2556,66 +2550,34 @@ Backend aggregation
 +
 Deterministic business rules
 ```
-
 ---
-
-# 70. Example Deterministic Insight Implementation
-
+29. Example Deterministic Insight Logic
 Concept:
-
 ```text
-currentExpense = calculateCurrentMonthExpense()
-previousExpense = calculatePreviousMonthExpense()
+currentExpense = calculateCurrentPeriodExpense()
+previousExpense = calculatePreviousPeriodExpense()
 
 if previousExpense > 0:
     change = ((currentExpense - previousExpense) / previousExpense) * 100
 
-    if change >= threshold:
+    if change >= configuredThreshold:
         createInsight(...)
 ```
-
-The rule should be:
-
+Example output:
 ```text
-deterministic
-repeatable
-testable
-explainable
+Your expenses increased by 18%
+compared with last month.
 ```
-
+The rule must be:
+```text
+Deterministic
+Repeatable
+Explainable
+Testable
+```
 ---
-
-# 71. Environment Security Rule
-
-Never commit:
-
-```text
-.env
-```
-
-Commit:
-
-```text
-.env.example
-```
-
-The `.env.example` file must contain placeholders:
-
-```text
-MONGO_URI=your_mongodb_connection_string
-JWT_SECRET=your_secure_secret
-ADMIN_EMAIL=admin@example.com
-ADMIN_PASSWORD=change_me
-```
-
-Do not use real credentials.
-
----
-
-# 72. MongoDB Compass Workflow
-
+30. MongoDB Compass Development Workflow
 Development workflow:
-
 ```text
 Start MongoDB
  ↓
@@ -2627,34 +2589,30 @@ Run seed
  ↓
 Open MongoDB Compass
  ↓
+Inspect collections
+```
 Inspect:
+```text
 users
 categories
-transactions
 accounts
+transactions
 budgets
 recurringtransactions
 savingsgoals
 notifications
+passwordresettokens
 auditlogs
 ```
-
-Compass is for inspection/development management.
-
-The application uses Mongoose.
-
+MongoDB Compass is for database inspection/development management.
+The application accesses MongoDB through Mongoose.
 ---
-
-# 73. Seed Workflow
-
-Recommended command concept:
-
+31. Seed Workflow
+Recommended command:
 ```text
 npm run seed
 ```
-
 Flow:
-
 ```text
 Load environment
  ↓
@@ -2666,15 +2624,10 @@ Seed system categories
  ↓
 Close connection
 ```
-
-Seed should be safe to run multiple times.
-
+Seed must be safe to run repeatedly.
 ---
-
-# 74. Development Run Workflow
-
+32. Local Development Workflow
 Typical development:
-
 ```text
 Terminal 1
 Frontend
@@ -2688,17 +2641,14 @@ npm run dev
 
 MongoDB
  ↓
-Running/connected
+Running
 
 MongoDB Compass
  ↓
 Optional inspection
 ```
-
 ---
-
-# 75. Production Build Workflow
-
+33. Production Build Workflow
 ```text
 Install dependencies
  ↓
@@ -2708,436 +2658,19 @@ Build frontend
  ↓
 Build backend
  ↓
-Run database setup/migrations/seed as required
+Verify database
+ ↓
+Run seed/setup if required
  ↓
 Start backend
  ↓
-Serve/deploy frontend
+Deploy frontend
  ↓
 Smoke test
 ```
-
 ---
-
-# 76. API Development Pattern
-
-Each feature should follow:
-
-```text
-Route
- ↓
-Middleware
- ↓
-Validation
- ↓
-Controller
- ↓
-Service
- ↓
-Model/Repository
- ↓
-MongoDB
-```
-
-Controller should remain thin.
-
-Business logic belongs in services.
-
----
-
-# 77. Financial Service Pattern
-
-Example:
-
-```text
-TransactionService
-BudgetService
-AccountService
-AnalyticsService
-InsightService
-ReportService
-RecurringTransactionService
-SavingsGoalService
-NotificationService
-```
-
-Avoid putting complex financial calculations directly in route handlers.
-
----
-
-# 78. Frontend Feature Pattern
-
-Each major feature should have:
-
-```text
-Page
-Components
-API service
-Types
-Hooks/state
-Validation
-Loading state
-Error state
-Empty state
-```
-
----
-
-# 79. Shared Financial Utility Layer
-
-Create shared utilities for:
-
-```text
-Currency formatting
-Percentage formatting
-Date formatting
-Date range calculation
-Financial period calculation
-```
-
-Do not duplicate formatting/calculation logic across pages.
-
----
-
-# 80. Backend Financial Utility Layer
-
-Centralize:
-
-```text
-Money validation
-Date periods
-Savings rate
-Budget percentage
-Goal percentage
-Trend comparison
-```
-
----
-
-# 81. Data Fetching Strategy
-
-Use a consistent frontend data-fetching approach.
-
-Requirements:
-
-```text
-Loading state
-Error state
-Caching where appropriate
-Invalidation after mutations
-```
-
-Avoid unnecessary repeated requests.
-
----
-
-# 82. Mutation Invalidation
-
-After creating an expense, invalidate/refresh relevant data:
-
-```text
-Transactions
-Dashboard
-Budgets
-Analytics
-Accounts
-Notifications
-```
-
-Only refresh what is actually affected.
-
----
-
-# 83. Security Testing Examples
-
-Test:
-
-```text
-User A cannot read User B transaction
-User A cannot edit User B transaction
-User A cannot delete User B transaction
-User cannot access admin route
-User cannot modify system category
-User cannot upload unauthorized receipt
-```
-
----
-
-# 84. File Security Testing
-
-Test:
-
-```text
-Invalid extension
-Invalid MIME
-Oversized file
-Malformed file
-Unauthorized access
-Path traversal attempt
-Unexpected filename
-```
-
----
-
-# 85. Financial Integrity Testing
-
-Test:
-
-```text
-Income increases income total
-Expense increases expense total
-Deleting expense decreases expense total
-Budget usage changes correctly
-Account balance changes correctly
-Savings rate changes correctly
-Analytics reflect transaction changes
-Reports reflect transaction changes
-```
-
----
-
-# 86. Recurring Integrity Testing
-
-Test:
-
-```text
-Due recurring transaction creates exactly one transaction
-Repeated job execution does not duplicate it
-Paused recurring transaction does not process
-Expired recurring transaction stops
-Next occurrence is correct
-```
-
----
-
-# 87. Budget Testing
-
-Test:
-
-```text
-0%
-50%
-75%
-90%
-100%
->100%
-```
-
-Verify:
-
-```text
-Progress
-Remaining
-Warning
-Critical
-Exceeded
-Notification
-```
-
----
-
-# 88. Goal Testing
-
-Test:
-
-```text
-0%
-43.75%
-99%
-100%
->100%
-```
-
-Verify completion behavior.
-
----
-
-# 89. Analytics Testing
-
-Test:
-
-```text
-No transactions
-One month
-Multiple months
-Only income
-Only expenses
-Income + expenses
-Category filtering
-Account filtering
-Date filtering
-```
-
----
-
-# 90. Report Testing
-
-Verify:
-
-```text
-PDF opens
-CSV opens
-Values match dashboard
-Values match analytics
-No sensitive fields included
-Correct date range
-Correct currency
-```
-
----
-
-# 91. Responsive QA
-
-Test at minimum:
-
-```text
-Small mobile
-Large mobile
-Tablet
-Laptop
-Desktop
-Large desktop
-```
-
-Verify:
-
-```text
-Navigation
-Tables
-Forms
-Charts
-Dialogs
-Cards
-Dashboard
-Admin
-```
-
----
-
-# 92. Browser QA
-
-Verify supported modern browsers according to deployment target.
-
-At minimum, test:
-
-```text
-Chrome
-Edge
-Firefox
-Safari where applicable
-```
-
----
-
-# 93. Accessibility QA
-
-Check:
-
-```text
-Keyboard-only navigation
-Focus visibility
-Screen reader labels
-Color contrast
-Form labels
-Dialog focus
-Table semantics
-Chart summaries
-Reduced motion
-```
-
----
-
-# 94. Final Source-of-Truth Check
-
-Before release, compare:
-
-```text
-PRD.md
-TRD.md
-ARCHITECTURE.md
-DATABASESCHEMA.md
-UI/UX.md
-WEBFLOW.md
-IMPLEMENTATION.md
-```
-
-Confirm:
-
-```text
-No contradictory features
-No missing locked feature
-No unauthorized AI integration
-No conflicting technology
-No conflicting data model
-No conflicting navigation
-```
-
----
-
-# 95. Phase Completion Tracker
-
-Recommended project tracker:
-
-| Phase | Status |
-|---|---|
-| 1. Project Initialization | Pending |
-| 2. Backend Foundation | Pending |
-| 3. MongoDB Foundation | Pending |
-| 4. Authentication | Pending |
-| 5. Forgot/Reset Password | Pending |
-| 6. RBAC/Admin Foundation | Pending |
-| 7. Seed Data | Pending |
-| 8. Frontend Foundation | Pending |
-| 9. Authentication Frontend | Pending |
-| 10. Profile/Settings | Pending |
-| 11. Accounts | Pending |
-| 12. Categories | Pending |
-| 13. Transactions | Pending |
-| 14. Search/Filters | Pending |
-| 15. Receipt Uploads | Pending |
-| 16. Dashboard Backend | Pending |
-| 17. Dashboard Frontend | Pending |
-| 18. Budgets | Pending |
-| 19. Budget Notifications | Pending |
-| 20. Recurring Transactions | Pending |
-| 21. Recurring Job | Pending |
-| 22. Savings Goals | Pending |
-| 23. Notifications | Pending |
-| 24. Analytics Backend | Pending |
-| 25. Analytics Frontend | Pending |
-| 26. Deterministic Insights | Pending |
-| 27. Calendar | Pending |
-| 28. Reports | Pending |
-| 29. Data Export | Pending |
-| 30. Admin Dashboard | Pending |
-| 31. Admin Users | Pending |
-| 32. Audit Logs | Pending |
-| 33. System Settings | Pending |
-| 34. UI Polish | Pending |
-| 35. Motion Polish | Pending |
-| 36. Accessibility | Pending |
-| 37. Security Hardening | Pending |
-| 38. Backend Testing | Pending |
-| 39. Frontend Testing | Pending |
-| 40. E2E Testing | Pending |
-| 41. Performance | Pending |
-| 42. Database Review | Pending |
-| 43. Production Config | Pending |
-| 44. Deployment Prep | Pending |
-| 45. Smoke Test | Pending |
-| 46. Documentation | Pending |
-| 47. Final QA | Pending |
-| 48. Release | Pending |
-| 49. Post-Release Verification | Pending |
-
----
-
-# 96. Final Implementation Checklist
-
-Before declaring FinTrack complete:
-
-## Foundation
-
+34. Production Release Checklist
+Foundation
 ```text
 [ ] Repository configured
 [ ] Frontend configured
@@ -3149,9 +2682,7 @@ Before declaring FinTrack complete:
 [ ] .env.example configured
 [ ] .gitignore configured
 ```
-
-## Authentication
-
+Authentication
 ```text
 [ ] Register
 [ ] Login
@@ -3163,31 +2694,25 @@ Before declaring FinTrack complete:
 [ ] Reset password
 [ ] bcrypt
 ```
-
-## RBAC
-
+RBAC
 ```text
-[ ] User role
-[ ] Admin role
+[ ] USER role
+[ ] ADMIN role
 [ ] Admin seed
 [ ] Role middleware
 [ ] Admin routes
 [ ] Audit logs
 ```
-
-## Financial Core
-
+Financial Core
 ```text
 [ ] Accounts
 [ ] Categories
 [ ] Transactions
 [ ] Search
 [ ] Filters
-[ ] Receipts
+[ ] Receipt uploads
 ```
-
-## Planning
-
+Planning
 ```text
 [ ] Budgets
 [ ] Budget alerts
@@ -3195,9 +2720,7 @@ Before declaring FinTrack complete:
 [ ] Recurring scheduler
 [ ] Savings goals
 ```
-
-## Analytics
-
+Analytics
 ```text
 [ ] Dashboard
 [ ] Income analytics
@@ -3207,20 +2730,15 @@ Before declaring FinTrack complete:
 [ ] Savings trend
 [ ] Deterministic insights
 ```
-
-## Productivity
-
+Productivity
 ```text
 [ ] Calendar
 [ ] Notifications
-[ ] Reports
-[ ] CSV
 [ ] PDF
+[ ] CSV
 [ ] Data export
 ```
-
-## UX
-
+UX
 ```text
 [ ] Responsive
 [ ] Mobile navigation
@@ -3232,9 +2750,7 @@ Before declaring FinTrack complete:
 [ ] Accessible charts
 [ ] Subtle transitions
 ```
-
-## Security
-
+Security
 ```text
 [ ] Authorization
 [ ] Ownership checks
@@ -3247,149 +2763,289 @@ Before declaring FinTrack complete:
 [ ] No secrets in Git
 [ ] No AI API keys
 ```
-
 ---
+35. Phase Completion Tracker
+Phase	Status
+1. Project Initialization & Development Foundation	Pending
+2. Backend Architecture, API Foundation & MongoDB	Pending
+3. Database Models, Indexes & Seed System	Pending
+4. Authentication, Password Security & Session Management	Pending
+5. Forgot/Reset Password & RBAC	Pending
 
-# 97. Final Architecture Constraint
-
-Implementation must preserve the following high-level flow:
-
-```text
-React Frontend
-      ↓
-HTTP API
-      ↓
-Express
-      ↓
-Auth / RBAC / Validation
-      ↓
-Controllers
-      ↓
-Services
-      ↓
-Mongoose
-      ↓
-MongoDB
-```
-
-For receipts:
-
-```text
-React
- ↓
-Multipart Request
- ↓
-Multer
- ↓
-Validation
- ↓
-File Storage
- ↓
-Receipt Metadata
- ↓
-MongoDB
-```
-
-For financial insights:
-
-```text
-MongoDB
- ↓
-Aggregation
- ↓
-Analytics Service
- ↓
-Deterministic Insight Rules
- ↓
-Insight
- ↓
-Frontend
-```
-
-No AI API is present in any of these flows.
-
+6. Frontend Foundation, Design System & Application Shell	Pending
+7. Authentication Frontend, Protected Routes & Settings	Pending
+8. Accounts, Wallets & Categories	Pending
+9. Income & Expense Transaction Core	Pending
+10. Transaction Search, Filters, Pagination & Receipts	Pending
+11. Dashboard Backend & Financial Calculation Services	Pending
+12. Dashboard Frontend & Main Product Experience	Pending
+13. Monthly Budgets & Budget Alerts	Pending
+14. Recurring Transactions, Scheduler & Savings Goals	Pending
+15. Notifications, Analytics & Deterministic Insights	Pending
+16. Calendar, Reports & Data Export	Pending
+17. Admin Dashboard, User Management & Audit Logs	Pending
+18. UI Polish, Accessibility, Responsive QA & Performance	Pending
+19. Security Hardening, Testing & Production Readiness	Pending
+20. Production Deployment, Smoke Test & Release	Pending
 ---
-
-# 98. Final Scope Lock
-
-The implementation roadmap is locked to the approved FinTrack v1 scope.
-
-The project must include:
-
+36. Final Scope Lock
+The 20-phase implementation plan contains the complete approved FinTrack v1 scope.
+The implementation must include:
 ```text
-Authentication
-JWT
-bcrypt
-Forgot/reset password
+User Authentication
+Register
+Login
+Logout
+JWT authentication
+HTTP-only cookie
+bcrypt password hashing
+Forgot password
+Reset password
 Protected dashboard
-RBAC
+
+Role-Based Access Control
+USER role
+ADMIN role
 Default seeded admin
-Income/expense management
-Accounts/wallets
-Categories
-Search/filter
-Receipt uploads using Multer
-Dashboard analytics
-Monthly budgets
-Budget alerts
-Recurring transactions
-Savings goals
-Expense analytics
-Deterministic financial insights
-Calendar
-Notifications
-PDF reports
-CSV exports
-User data export
-Dark mode
-Responsive UI
-Admin dashboard
-Admin user management
+Admin authorization
 Audit logs
+
+Income & Expense Management
+Income
+Expense
+Categories
+Descriptions
+Dates
+Payment methods
+Notes
+Accounts
+
+Accounts / Wallets
+Cash
+Bank Account
+Credit Card
+UPI
+Other
+
+Transaction Search & Filters
+Date
+Category
+Income/Expense
+Amount
+Account
+Payment method
+Text search
+
+Receipt Upload
+Multer
+File validation
+Secure storage/access
+Transaction association
+
+Dashboard
+Total income
+Total expenses
+Remaining balance
+Savings rate
+Monthly income vs expenses
+Expense categories
+Spending trend
+Savings trend
+
+Monthly Budgets
+Category budgets
+Progress
+Thresholds
+Warnings
+Exceeded state
+
+Recurring Transactions
+Daily
+Weekly
+Monthly
+Yearly
+Scheduler
+Idempotency
+Pause/resume
+
+Savings Goals
+Target
+Current saved
+Progress
+Contribution
+Deadline
+Completion
+
+Expense Analytics
+Category analysis
+Payment methods
+Accounts
+Trends
+Date ranges
+
+Deterministic Financial Insights
+Expense comparisons
+Category concentration
+Savings comparisons
+Budget events
+Goal proximity
+
+Calendar
+Recurring events
+Goal deadlines
+Budget periods
+
+Notifications
+Budget alerts
+Recurring payments
+Goal milestones
+Insights
+System notifications
+
+Reports
+PDF
+CSV
+Monthly reports
+Data export
+
+UI/UX
+Responsive
+Mobile
+Tablet
+Desktop
+Dark mode
+System theme
+Accessible
+Subtle transitions
+Professional fintech design
+
+Admin
+Dashboard
+Users
+Categories
 System settings
+Audit logs
+
+Testing
+Unit
+Integration
+Security
+Frontend
+E2E
+Responsive
+Accessibility
+
+Deployment
+Production configuration
+Build
+Smoke test
+Release
+Post-release verification
 ```
-
-The project must not include:
-
+---
+37. Explicitly Excluded Scope
+The following must not be added unless the source-of-truth documents are intentionally changed and re-locked:
 ```text
-AI API integrations
+AI API integration
 AI API keys
 AI chatbot
 AI financial advisor
-External AI classification
-External AI-generated insights
+LLM-based transaction categorization
+AI-generated financial recommendations
+External AI analytics
+Cryptocurrency portfolio tracking
+Stock trading
+Bank account direct synchronization
+Open banking integrations
+Payment gateway integration
+Social networking
+Public financial profiles
 ```
-
+The application may be extended later, but such changes must update the relevant source-of-truth documents first.
 ---
-
-# 99. Final Implementation Source-of-Truth Rule
-
-Implementation decisions must remain aligned with:
-
+38. Final Source-of-Truth Relationship
+The project documentation hierarchy is:
 ```text
 PRD.md
+    ↓
+Product requirements
+
 TRD.md
+    ↓
+Technical requirements
+
 ARCHITECTURE.md
+    ↓
+System architecture
+
 DATABASESCHEMA.md
+    ↓
+Database structure
+
 UI/UX.md
+    ↓
+Visual and interaction design
+
 WEBFLOW.md
+    ↓
+Navigation and user/admin flows
+
 IMPLEMENTATION.md
+    ↓
+Execution roadmap
 ```
-
-If implementation reveals a necessary change, update the relevant source-of-truth document before treating the new behavior as part of the locked product.
-
+All seven documents must remain consistent.
+If implementation requires a change in product scope, architecture, database structure, UI/UX, or flow, update the relevant source-of-truth document before considering the new behavior part of the locked product.
 ---
-
-# 100. Final Statement
-
-`IMPLEMENTATION.md` defines the complete phased implementation roadmap for FinTrack v1.
-
-The project should be developed from foundation → authentication → financial core → dashboard → planning → analytics → reporting → administration → quality → deployment.
-
-Each phase must meet its definition of done before the project moves forward.
-
-The application must remain:
-
+39. Final Implementation Rule
+FinTrack must be developed in the following strategic order:
+```text
+Foundation
+    ↓
+Backend + Database
+    ↓
+Authentication + Security
+    ↓
+Frontend Shell
+    ↓
+Financial Core
+    ↓
+Dashboard
+    ↓
+Budgets
+    ↓
+Recurring + Goals
+    ↓
+Analytics + Deterministic Insights
+    ↓
+Reports + Calendar
+    ↓
+Admin
+    ↓
+Polish + Accessibility
+    ↓
+Testing + Security Hardening
+    ↓
+Production Release
+```
+This sequence minimizes rework and ensures that each major feature is built on the correct foundation.
+---
+40. Final Statement
+`IMPLEMENTATION.md` defines the complete 20-phase implementation roadmap for FinTrack v1.
+The previous detailed 49-phase roadmap has been consolidated into these 20 phases without removing the approved functionality.
+Each phase groups logically related work while preserving:
+```text
+Security
+Authentication
+RBAC
+Financial integrity
+Database integrity
+Responsive UI
+Accessibility
+Testing
+Production readiness
+```
+The project must remain:
 ```text
 Secure
 Responsive
@@ -3400,5 +3056,4 @@ User-focused
 Financially consistent
 AI-free
 ```
-
-**`IMPLEMENTATION.md` is the implementation roadmap and execution source of truth for FinTrack v1.**
+`IMPLEMENTATION.md` is the implementation roadmap and execution source of truth for FinTrack v1.
