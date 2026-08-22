@@ -1,2 +1,1 @@
-// Scaffolding for seed scripts
-export {};
+export * from "./seed";
