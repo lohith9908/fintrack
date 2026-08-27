@@ -1,2 +1,1 @@
-// Scaffolding for pages
-export {};
+export * from "./DesignSystemShowcase";
