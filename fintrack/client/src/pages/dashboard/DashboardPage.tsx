@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import {
   TrendingUp,
   TrendingDown,
-  ArrowDownLeft,
   DollarSign,
   PieChart as PieChartIcon,
   CreditCard,
@@ -13,10 +12,6 @@ import {
   Building2,
   Smartphone,
   Layers,
-  Sparkles,
-  AlertTriangle,
-  Info,
-  CheckCircle2,
   Calendar,
   RefreshCw,
 } from "lucide-react";
@@ -46,6 +41,15 @@ import {
   EmptyState,
   Tabs,
 } from "../../components/ui";
+import {
+  IncomeExpenseChart,
+  CategoryPieChart,
+  SavingsTrendChart,
+  BudgetWidget,
+  SavingsGoalsWidget,
+  UpcomingPaymentsWidget,
+  InsightsWidget,
+} from "../../components/dashboard";
 import { formatCurrency, formatPercent, formatDate } from "../../utils/formatters";
 
 const ACCOUNT_ICONS: Record<string, React.FC<{ className?: string }>> = {
@@ -54,7 +58,6 @@ const ACCOUNT_ICONS: Record<string, React.FC<{ className?: string }>> = {
   MOBILE_WALLET: Smartphone,
   CREDIT_CARD: CreditCard,
   INVESTMENT: TrendingUp,
-  LOAN: ArrowDownLeft,
   OTHER: Layers,
 };
 
@@ -66,6 +69,8 @@ export const DashboardPage: React.FC = () => {
   const [selectedPeriod, setSelectedPeriod] = useState<
     "30d" | "current_month" | "6m" | "12m" | "all"
   >("30d");
+
+  const [activeSideTab, setActiveSideTab] = useState<"budgets" | "goals">("budgets");
 
   const loadDashboardData = useCallback(async (period = selectedPeriod) => {
     try {
@@ -91,7 +96,7 @@ export const DashboardPage: React.FC = () => {
   const currency = user?.currency || summary?.currency || "INR";
 
   return (
-    <div className="space-y-8 animate-fadeIn max-w-[1440px] mx-auto">
+    <div className="space-y-8 animate-fadeIn max-w-[1440px] mx-auto pb-10">
       {/* Header Banner */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border pb-6">
         <div className="space-y-1">
@@ -104,7 +109,7 @@ export const DashboardPage: React.FC = () => {
             </Badge>
           </div>
           <p className="text-xs sm:text-sm text-muted-foreground">
-            Centralized financial health metrics and cash flow calculations.
+            Complete financial overview, cash flow analytics, and budgeting health.
           </p>
         </div>
 
@@ -152,7 +157,10 @@ export const DashboardPage: React.FC = () => {
             <Skeleton variant="rectangular" className="h-28 w-full" />
             <Skeleton variant="rectangular" className="h-28 w-full" />
           </div>
-          <Skeleton variant="rectangular" className="h-72 w-full" />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <Skeleton variant="rectangular" className="h-72 lg:col-span-2 w-full" />
+            <Skeleton variant="rectangular" className="h-72 w-full" />
+          </div>
         </div>
       ) : error ? (
         <ErrorState
@@ -169,7 +177,7 @@ export const DashboardPage: React.FC = () => {
         />
       ) : (
         <>
-          {/* Summary Metric Cards */}
+          {/* Row 1: Summary Metric Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Total Income */}
             <Card hover className="bg-gradient-to-br from-card to-card/80">
@@ -266,50 +274,56 @@ export const DashboardPage: React.FC = () => {
             </Card>
           </div>
 
-          {/* Rule-Based Financial Insights */}
-          {data.insights.length > 0 && (
-            <div className="space-y-3">
-              <h3 className="text-xs uppercase tracking-wider font-bold text-muted-foreground flex items-center gap-1.5">
-                <Sparkles className="h-3.5 w-3.5 text-primary" />
-                <span>Deterministic Financial Insights</span>
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {data.insights.map((insight) => {
-                  const isSuccess = insight.type === "SUCCESS";
-                  const isWarning = insight.type === "WARNING";
-
-                  const IconComponent = isSuccess
-                    ? CheckCircle2
-                    : isWarning
-                    ? AlertTriangle
-                    : Info;
-
-                  return (
-                    <div
-                      key={insight.id}
-                      className={`p-3.5 rounded-xl border flex items-start gap-3 transition-colors ${
-                        isSuccess
-                          ? "bg-emerald-500/5 border-emerald-500/20 text-emerald-600 dark:text-emerald-400"
-                          : isWarning
-                          ? "bg-rose-500/5 border-rose-500/20 text-rose-600 dark:text-rose-400"
-                          : "bg-primary/5 border-primary/20 text-primary"
-                      }`}
-                    >
-                      <IconComponent className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                      <div className="space-y-0.5 text-xs">
-                        <p className="font-bold text-foreground">{insight.title}</p>
-                        <p className="text-muted-foreground leading-relaxed">
-                          {insight.message}
-                        </p>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+          {/* Row 2: Charts Comparison & Category Breakdown */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+              <IncomeExpenseChart
+                data={data.monthlyTrends}
+                currency={currency}
+              />
             </div>
-          )}
+            <div>
+              <CategoryPieChart
+                categories={data.categoryBreakdown}
+                currency={currency}
+              />
+            </div>
+          </div>
 
-          {/* Grid Layout: Recent Transactions & Account Breakdown */}
+          {/* Row 3: Trends & Goals/Budgets Widgets */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+              <SavingsTrendChart
+                data={data.monthlyTrends}
+                currency={currency}
+              />
+            </div>
+
+            <div className="space-y-4">
+              <div className="flex items-center justify-between border-b border-border/40 pb-2">
+                <Tabs
+                  activeTab={activeSideTab}
+                  onTabChange={(t) => setActiveSideTab(t as "budgets" | "goals")}
+                  variant="pill"
+                  tabs={[
+                    { id: "budgets", label: "Budgets" },
+                    { id: "goals", label: "Savings Goals" },
+                  ]}
+                />
+              </div>
+
+              {activeSideTab === "budgets" ? (
+                <BudgetWidget budgets={data.budgetStatus} currency={currency} />
+              ) : (
+                <SavingsGoalsWidget goals={data.goalsProgress} currency={currency} />
+              )}
+            </div>
+          </div>
+
+          {/* Row 4: Deterministic Financial Insights */}
+          <InsightsWidget insights={data.insights} />
+
+          {/* Row 5: Recent Transactions & Connected Wallets */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Recent Transactions Table */}
             <Card className="lg:col-span-2 overflow-hidden border border-border">
@@ -397,7 +411,7 @@ export const DashboardPage: React.FC = () => {
               </CardContent>
             </Card>
 
-            {/* Connected Wallets & Category Analytics Summary */}
+            {/* Connected Wallets & Upcoming Payments */}
             <div className="space-y-6">
               {/* Connected Accounts */}
               <Card className="border border-border">
@@ -447,36 +461,11 @@ export const DashboardPage: React.FC = () => {
                 </CardContent>
               </Card>
 
-              {/* Expense Category Breakdown */}
-              {data.categoryBreakdown.length > 0 && (
-                <Card className="border border-border">
-                  <CardHeader className="pb-3">
-                    <CardTitle>Top Expense Categories</CardTitle>
-                    <CardDescription>
-                      Distribution of spendings in selected period
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-3 text-xs">
-                    {data.categoryBreakdown.slice(0, 4).map((cat) => (
-                      <div key={cat.categoryId} className="space-y-1.5">
-                        <div className="flex items-center justify-between">
-                          <span className="font-medium text-foreground">
-                            {cat.name}
-                          </span>
-                          <span className="font-bold text-foreground">
-                            {formatCurrency(cat.amount, currency)} ({cat.percentage}%)
-                          </span>
-                        </div>
-                        <Progress
-                          value={cat.percentage}
-                          size="sm"
-                          className="bg-secondary"
-                        />
-                      </div>
-                    ))}
-                  </CardContent>
-                </Card>
-              )}
+              {/* Upcoming Payments Widget */}
+              <UpcomingPaymentsWidget
+                payments={data.upcomingRecurring}
+                currency={currency}
+              />
             </div>
           </div>
         </>
