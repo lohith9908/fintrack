@@ -6,3 +6,5 @@ export * from "./category.service";
 export * from "./transaction.service";
 export * from "./dashboard.service";
 export * from "./budget.service";
+export * from "./recurring.service";
+export * from "./goal.service";

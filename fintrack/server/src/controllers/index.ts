@@ -6,3 +6,5 @@ export * from "./category.controller";
 export * from "./transaction.controller";
 export * from "./dashboard.controller";
 export * from "./budget.controller";
+export * from "./recurring.controller";
+export * from "./goal.controller";

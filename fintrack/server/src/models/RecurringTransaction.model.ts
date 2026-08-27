@@ -64,6 +64,10 @@ const recurringTransactionSchema = new Schema<IRecurringTransaction>(
     lastProcessedOccurrence: {
       type: Date,
     },
+    notes: {
+      type: String,
+      trim: true,
+    },
   },
   {
     timestamps: true,

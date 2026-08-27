@@ -161,8 +161,17 @@ export interface IRecurringTransaction extends Document {
   endDate?: Date;
   isActive: boolean;
   lastProcessedOccurrence?: Date;
+  notes?: string;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface IGoalContribution {
+  _id?: Types.ObjectId;
+  amount: number;
+  date: Date;
+  account?: Types.ObjectId;
+  note?: string;
 }
 
 export interface ISavingsGoal extends Document {
@@ -175,6 +184,7 @@ export interface ISavingsGoal extends Document {
   category?: string;
   description?: string;
   status: SavingsGoalStatus;
+  contributions?: IGoalContribution[];
   createdAt: Date;
   updatedAt: Date;
 }

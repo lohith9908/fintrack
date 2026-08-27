@@ -8,3 +8,5 @@ export * from "./dashboard/DashboardPage";
 export * from "./accounts/AccountsPage";
 export * from "./transactions/TransactionsPage";
 export * from "./budgets/BudgetsPage";
+export * from "./recurring/RecurringTransactionsPage";
+export * from "./goals/SavingsGoalsPage";

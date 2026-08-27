@@ -8,6 +8,8 @@ import { categoryRouter } from "./category.routes";
 import { transactionRouter } from "./transaction.routes";
 import { dashboardRouter } from "./dashboard.routes";
 import { budgetRoutes } from "./budget.routes";
+import { recurringRouter } from "./recurring.routes";
+import { goalRouter } from "./goal.routes";
 
 const router = Router();
 
@@ -34,6 +36,12 @@ router.use("/dashboard", dashboardRouter);
 
 // Mount Monthly Budgets routes (/api/budgets/...)
 router.use("/budgets", budgetRoutes);
+
+// Mount Recurring Transactions routes (/api/recurring-transactions/...)
+router.use("/recurring-transactions", recurringRouter);
+
+// Mount Savings Goals routes (/api/goals/...)
+router.use("/goals", goalRouter);
 
 // Mount Admin routes (/api/admin/...)
 router.use("/admin", adminRoutes);

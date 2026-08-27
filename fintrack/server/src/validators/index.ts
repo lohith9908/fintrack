@@ -5,3 +5,5 @@ export * from "./category.validator";
 export * from "./transaction.validator";
 export * from "./dashboard.validator";
 export * from "./budget.validator";
+export * from "./recurring.validator";
+export * from "./goal.validator";

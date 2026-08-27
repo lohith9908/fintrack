@@ -43,6 +43,27 @@ const savingsGoalSchema = new Schema<ISavingsGoal>(
       default: "ACTIVE",
       index: true,
     },
+    contributions: [
+      {
+        amount: {
+          type: Number,
+          required: true,
+          min: [0.01, "Contribution amount must be positive"],
+        },
+        date: {
+          type: Date,
+          default: Date.now,
+        },
+        account: {
+          type: Schema.Types.ObjectId,
+          ref: "Account",
+        },
+        note: {
+          type: String,
+          trim: true,
+        },
+      },
+    ],
   },
   {
     timestamps: true,
