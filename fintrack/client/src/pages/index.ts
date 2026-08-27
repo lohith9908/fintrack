@@ -6,3 +6,4 @@ export * from "./auth/ResetPasswordPage";
 export * from "./settings/SettingsPage";
 export * from "./dashboard/DashboardPage";
 export * from "./accounts/AccountsPage";
+export * from "./transactions/TransactionsPage";

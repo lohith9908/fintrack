@@ -15,6 +15,7 @@ import {
   DashboardPage,
   DesignSystemShowcase,
   AccountsPage,
+  TransactionsPage,
 } from "../pages";
 
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "../components/ui/Card";
@@ -103,16 +104,7 @@ export const AppRoutes: React.FC = () => {
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/settings" element={<SettingsPage />} />
 
-            <Route
-              path="/transactions"
-              element={
-                <PhaseShellPlaceholder
-                  title="Transactions & Ledger"
-                  phase="Phase 9"
-                  description="Searchable, filterable income and expense records with receipt attachments."
-                />
-              }
-            />
+            <Route path="/transactions" element={<TransactionsPage />} />
             <Route path="/accounts" element={<AccountsPage />} />
             <Route
               path="/budgets"

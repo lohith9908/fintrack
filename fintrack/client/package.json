@@ -10,7 +10,8 @@
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "typecheck": "tsc --noEmit",
     "test:phase6": "npx tsx src/tests/runtimePhase6.test.tsx",
-    "test:phase8": "npx tsx src/tests/runtimePhase8.test.tsx"
+    "test:phase8": "npx tsx src/tests/runtimePhase8.test.tsx",
+    "test:phase9": "npx tsx src/tests/runtimePhase9.test.tsx"
   },
   "dependencies": {
     "axios": "^1.7.9",

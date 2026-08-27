@@ -5,6 +5,7 @@ import userRoutes from "./user.routes";
 import adminRoutes from "./admin.routes";
 import { accountRouter } from "./account.routes";
 import { categoryRouter } from "./category.routes";
+import { transactionRouter } from "./transaction.routes";
 
 const router = Router();
 
@@ -22,6 +23,9 @@ router.use("/accounts", accountRouter);
 
 // Mount Categories routes (/api/categories/...)
 router.use("/categories", categoryRouter);
+
+// Mount Financial Transactions routes (/api/transactions/...)
+router.use("/transactions", transactionRouter);
 
 // Mount Admin routes (/api/admin/...)
 router.use("/admin", adminRoutes);
