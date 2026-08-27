@@ -14,6 +14,7 @@ import {
   SettingsPage,
   DashboardPage,
   DesignSystemShowcase,
+  AccountsPage,
 } from "../pages";
 
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "../components/ui/Card";
@@ -112,16 +113,7 @@ export const AppRoutes: React.FC = () => {
                 />
               }
             />
-            <Route
-              path="/accounts"
-              element={
-                <PhaseShellPlaceholder
-                  title="Accounts & Wallets"
-                  phase="Phase 8"
-                  description="Manage bank accounts, cash wallets, credit cards, and UPI balances."
-                />
-              }
-            />
+            <Route path="/accounts" element={<AccountsPage />} />
             <Route
               path="/budgets"
               element={

@@ -3,6 +3,8 @@ import healthRoutes from "./health.routes";
 import authRoutes from "./auth.routes";
 import userRoutes from "./user.routes";
 import adminRoutes from "./admin.routes";
+import { accountRouter } from "./account.routes";
+import { categoryRouter } from "./category.routes";
 
 const router = Router();
 
@@ -14,6 +16,12 @@ router.use("/auth", authRoutes);
 
 // Mount User routes (/api/users/...)
 router.use("/users", userRoutes);
+
+// Mount Accounts & Wallets routes (/api/accounts/...)
+router.use("/accounts", accountRouter);
+
+// Mount Categories routes (/api/categories/...)
+router.use("/categories", categoryRouter);
 
 // Mount Admin routes (/api/admin/...)
 router.use("/admin", adminRoutes);

@@ -16,6 +16,7 @@
     "test:phase5": "tsx src/tests/e2ePhase5.test.ts",
     "test:phase7": "tsx src/tests/e2ePhase7.test.ts",
     "test:audit7": "tsx src/tests/auditPhase7.test.ts",
+    "test:phase8": "tsx src/tests/e2ePhase8.test.ts",
     "lint": "eslint src --ext .ts",
     "typecheck": "tsc --noEmit"
   },
