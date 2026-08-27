@@ -1,18 +1,31 @@
-import React from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import {
   TrendingUp,
   TrendingDown,
-  ArrowUpRight,
-  ArrowDownRight,
+  ArrowDownLeft,
   DollarSign,
   PieChart as PieChartIcon,
   CreditCard,
   Plus,
   ArrowRight,
-  ShieldCheck,
+  Wallet,
+  Building2,
+  Smartphone,
+  Layers,
+  Sparkles,
+  AlertTriangle,
+  Info,
+  CheckCircle2,
+  Calendar,
+  RefreshCw,
 } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
+import { DashboardService } from "../../services/dashboard.service";
+import {
+  DashboardOverviewData,
+  DashboardQueryParams,
+} from "../../types/dashboard.types";
 import {
   Card,
   CardHeader,
@@ -28,24 +41,59 @@ import {
   TableRow,
   TableHead,
   TableCell,
+  Skeleton,
+  ErrorState,
+  EmptyState,
+  Tabs,
 } from "../../components/ui";
 import { formatCurrency, formatPercent, formatDate } from "../../utils/formatters";
 
+const ACCOUNT_ICONS: Record<string, React.FC<{ className?: string }>> = {
+  BANK_ACCOUNT: Building2,
+  CASH: Wallet,
+  MOBILE_WALLET: Smartphone,
+  CREDIT_CARD: CreditCard,
+  INVESTMENT: TrendingUp,
+  LOAN: ArrowDownLeft,
+  OTHER: Layers,
+};
+
 export const DashboardPage: React.FC = () => {
   const { user } = useAuth();
+  const [data, setData] = useState<DashboardOverviewData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedPeriod, setSelectedPeriod] = useState<
+    "30d" | "current_month" | "6m" | "12m" | "all"
+  >("30d");
 
-  const mockRecentTransactions = [
-    { id: "1", desc: "Monthly Salary Deposit", category: "Salary", amount: 85000, type: "INCOME", date: "2026-08-01", method: "Bank Transfer" },
-    { id: "2", desc: "Grocery Supermarket", category: "Food", amount: -4250, type: "EXPENSE", date: "2026-08-05", method: "UPI" },
-    { id: "3", desc: "Electricity & Water Bill", category: "Bills", amount: -2890, type: "EXPENSE", date: "2026-08-10", method: "Credit Card" },
-    { id: "4", desc: "Freelance Consulting Payout", category: "Freelancing", amount: 32000, type: "INCOME", date: "2026-08-15", method: "UPI" },
-    { id: "5", desc: "Fuel & Metro Transit", category: "Transport", amount: -1500, type: "EXPENSE", date: "2026-08-18", method: "Cash" },
-  ];
+  const loadDashboardData = useCallback(async (period = selectedPeriod) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const params: DashboardQueryParams = { period };
+      const res = await DashboardService.getOverview(params);
+      setData(res);
+    } catch (err: unknown) {
+      const msg =
+        err instanceof Error ? err.message : "Failed to load dashboard overview";
+      setError(msg);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [selectedPeriod]);
+
+  useEffect(() => {
+    loadDashboardData(selectedPeriod);
+  }, [selectedPeriod, loadDashboardData]);
+
+  const summary = data?.summary;
+  const currency = user?.currency || summary?.currency || "INR";
 
   return (
-    <div className="space-y-8 animate-fadeIn">
+    <div className="space-y-8 animate-fadeIn max-w-[1440px] mx-auto">
       {/* Header Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border pb-6">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
@@ -56,210 +104,383 @@ export const DashboardPage: React.FC = () => {
             </Badge>
           </div>
           <p className="text-xs sm:text-sm text-muted-foreground">
-            Here is your financial health summary and cash flow overview for August 2026
+            Centralized financial health metrics and cash flow calculations.
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5">
-          <Link to="/settings">
-            <Button size="sm" variant="outline">
-              Account Settings
-            </Button>
-          </Link>
+        <div className="flex flex-wrap items-center gap-3">
+          <Tabs
+            activeTab={selectedPeriod}
+            onTabChange={(tab) =>
+              setSelectedPeriod(
+                tab as "30d" | "current_month" | "6m" | "12m" | "all"
+              )
+            }
+            variant="pill"
+            tabs={[
+              { id: "30d", label: "30 Days" },
+              { id: "current_month", label: "This Month" },
+              { id: "6m", label: "6 Months" },
+              { id: "12m", label: "1 Year" },
+              { id: "all", label: "All Time" },
+            ]}
+          />
+
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => loadDashboardData(selectedPeriod)}
+            className="flex items-center gap-1.5"
+          >
+            <RefreshCw className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Refresh</span>
+          </Button>
+
           <Link to="/transactions">
-            <Button size="sm" leftIcon={<Plus className="h-4 w-4" />}>
+            <Button size="sm" variant="primary" leftIcon={<Plus className="h-4 w-4" />}>
               Add Transaction
             </Button>
           </Link>
         </div>
       </div>
 
-      {/* Summary Cards per UI_UX.md Section 21 */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Card 1: Total Income */}
-        <Card hover>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardDescription className="font-medium text-xs">Total Income</CardDescription>
-            <div className="p-2 rounded-lg bg-success/10 text-success">
-              <TrendingUp className="h-4 w-4" />
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-1.5">
-            <div className="text-2xl font-extrabold text-foreground tracking-tight">
-              {formatCurrency(117000, user?.currency || "INR")}
-            </div>
-            <div className="flex items-center text-xs text-success font-semibold gap-1">
-              <ArrowUpRight className="h-3.5 w-3.5" />
-              <span>+14.2% vs last month</span>
-            </div>
-          </CardContent>
-        </Card>
+      {isLoading ? (
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Skeleton variant="rectangular" className="h-28 w-full" />
+            <Skeleton variant="rectangular" className="h-28 w-full" />
+            <Skeleton variant="rectangular" className="h-28 w-full" />
+            <Skeleton variant="rectangular" className="h-28 w-full" />
+          </div>
+          <Skeleton variant="rectangular" className="h-72 w-full" />
+        </div>
+      ) : error ? (
+        <ErrorState
+          title="Could not load financial overview"
+          message={error}
+          onRetry={() => loadDashboardData(selectedPeriod)}
+        />
+      ) : !data ? (
+        <EmptyState
+          title="No Financial Records Found"
+          description="Begin by adding an account and recording your initial transactions to generate live calculations."
+          actionLabel="Add Account"
+          onAction={() => {}}
+        />
+      ) : (
+        <>
+          {/* Summary Metric Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Total Income */}
+            <Card hover className="bg-gradient-to-br from-card to-card/80">
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardDescription className="font-semibold text-xs text-emerald-500 uppercase tracking-wider">
+                  Total Income
+                </CardDescription>
+                <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-500">
+                  <TrendingUp className="h-4 w-4" />
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-1">
+                <div className="text-2xl font-extrabold text-emerald-500 tracking-tight">
+                  +{formatCurrency(summary?.totalIncome || 0, currency)}
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  Recorded income in period
+                </div>
+              </CardContent>
+            </Card>
 
-        {/* Card 2: Total Expenses */}
-        <Card hover>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardDescription className="font-medium text-xs">Total Expenses</CardDescription>
-            <div className="p-2 rounded-lg bg-destructive/10 text-destructive">
-              <TrendingDown className="h-4 w-4" />
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-1.5">
-            <div className="text-2xl font-extrabold text-foreground tracking-tight">
-              {formatCurrency(48640, user?.currency || "INR")}
-            </div>
-            <div className="flex items-center text-xs text-muted-foreground font-semibold gap-1">
-              <ArrowDownRight className="h-3.5 w-3.5" />
-              <span>-3.5% under budget</span>
-            </div>
-          </CardContent>
-        </Card>
+            {/* Total Expenses */}
+            <Card hover className="bg-gradient-to-br from-card to-card/80">
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardDescription className="font-semibold text-xs text-rose-500 uppercase tracking-wider">
+                  Total Expenses
+                </CardDescription>
+                <div className="p-2 rounded-lg bg-rose-500/10 text-rose-500">
+                  <TrendingDown className="h-4 w-4" />
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-1">
+                <div className="text-2xl font-extrabold text-rose-500 tracking-tight">
+                  -{formatCurrency(summary?.totalExpenses || 0, currency)}
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  Recorded spendings in period
+                </div>
+              </CardContent>
+            </Card>
 
-        {/* Card 3: Remaining Balance */}
-        <Card hover>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardDescription className="font-medium text-xs">Remaining Balance</CardDescription>
-            <div className="p-2 rounded-lg bg-primary/10 text-primary">
-              <DollarSign className="h-4 w-4" />
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-1.5">
-            <div className="text-2xl font-extrabold text-foreground tracking-tight">
-              {formatCurrency(68360, user?.currency || "INR")}
-            </div>
-            <div className="flex items-center text-xs text-muted-foreground font-medium">
-              <span>Across linked accounts</span>
-            </div>
-          </CardContent>
-        </Card>
+            {/* Remaining Balance */}
+            <Card hover className="bg-gradient-to-br from-card to-card/80">
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardDescription className="font-semibold text-xs text-muted-foreground uppercase tracking-wider">
+                  Remaining Balance
+                </CardDescription>
+                <div className="p-2 rounded-lg bg-primary/10 text-primary">
+                  <DollarSign className="h-4 w-4" />
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-1">
+                <div
+                  className={`text-2xl font-extrabold tracking-tight ${
+                    (summary?.remainingBalance || 0) >= 0
+                      ? "text-foreground"
+                      : "text-rose-500"
+                  }`}
+                >
+                  {(summary?.remainingBalance || 0) >= 0 ? "+" : ""}
+                  {formatCurrency(summary?.remainingBalance || 0, currency)}
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  Net period cash flow surplus
+                </div>
+              </CardContent>
+            </Card>
 
-        {/* Card 4: Savings Rate */}
-        <Card hover>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardDescription className="font-medium text-xs">Savings Rate</CardDescription>
-            <div className="p-2 rounded-lg bg-warning/10 text-warning">
-              <PieChartIcon className="h-4 w-4" />
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <div className="flex items-baseline justify-between">
-              <span className="text-2xl font-extrabold text-foreground tracking-tight">
-                {formatPercent(58.4)}
-              </span>
-              <span className="text-xs font-semibold text-success">Target 50%</span>
-            </div>
-            <Progress value={58.4} variant="success" size="sm" />
-          </CardContent>
-        </Card>
-      </div>
+            {/* Savings Rate */}
+            <Card hover className="bg-gradient-to-br from-card to-card/80">
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardDescription className="font-semibold text-xs text-warning uppercase tracking-wider">
+                  Savings Rate
+                </CardDescription>
+                <div className="p-2 rounded-lg bg-warning/10 text-warning">
+                  <PieChartIcon className="h-4 w-4" />
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <div className="flex items-baseline justify-between">
+                  <span className="text-2xl font-extrabold text-foreground tracking-tight">
+                    {formatPercent(summary?.savingsRate || 0)}
+                  </span>
+                  <span className="text-xs font-semibold text-emerald-500">
+                    Net Worth: {formatCurrency(summary?.totalNetWorth || 0, currency)}
+                  </span>
+                </div>
+                <Progress
+                  value={Math.max(0, Math.min(100, summary?.savingsRate || 0))}
+                  variant="success"
+                  size="sm"
+                />
+              </CardContent>
+            </Card>
+          </div>
 
-      {/* Grid: Recent Transactions & Security/Status Overview */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Recent Transactions Table (2 cols) */}
-        <Card className="lg:col-span-2">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <div>
-              <CardTitle>Recent Transactions</CardTitle>
-              <CardDescription>Latest financial activity recorded in your accounts</CardDescription>
-            </div>
-            <Link to="/transactions" className="text-xs font-semibold text-primary hover:underline flex items-center gap-1">
-              <span>View All</span>
-              <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
-          </CardHeader>
-          <CardContent className="p-0">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Description</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead className="text-right">Amount</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {mockRecentTransactions.map((tx) => (
-                  <TableRow key={tx.id}>
-                    <TableCell className="font-semibold text-foreground">{tx.desc}</TableCell>
-                    <TableCell>
-                      <Badge variant={tx.type === "INCOME" ? "success" : "secondary"}>
-                        {tx.category}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-xs text-muted-foreground">{formatDate(tx.date)}</TableCell>
-                    <TableCell
-                      className={`text-right font-bold ${
-                        tx.type === "INCOME" ? "text-success" : "text-foreground"
+          {/* Rule-Based Financial Insights */}
+          {data.insights.length > 0 && (
+            <div className="space-y-3">
+              <h3 className="text-xs uppercase tracking-wider font-bold text-muted-foreground flex items-center gap-1.5">
+                <Sparkles className="h-3.5 w-3.5 text-primary" />
+                <span>Deterministic Financial Insights</span>
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {data.insights.map((insight) => {
+                  const isSuccess = insight.type === "SUCCESS";
+                  const isWarning = insight.type === "WARNING";
+
+                  const IconComponent = isSuccess
+                    ? CheckCircle2
+                    : isWarning
+                    ? AlertTriangle
+                    : Info;
+
+                  return (
+                    <div
+                      key={insight.id}
+                      className={`p-3.5 rounded-xl border flex items-start gap-3 transition-colors ${
+                        isSuccess
+                          ? "bg-emerald-500/5 border-emerald-500/20 text-emerald-600 dark:text-emerald-400"
+                          : isWarning
+                          ? "bg-rose-500/5 border-rose-500/20 text-rose-600 dark:text-rose-400"
+                          : "bg-primary/5 border-primary/20 text-primary"
                       }`}
                     >
-                      {formatCurrency(tx.amount, user?.currency || "INR")}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
+                      <IconComponent className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                      <div className="space-y-0.5 text-xs">
+                        <p className="font-bold text-foreground">{insight.title}</p>
+                        <p className="text-muted-foreground leading-relaxed">
+                          {insight.message}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
-        {/* Security & Account State Overview (1 col) */}
-        <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle>Account Security</CardTitle>
-                <ShieldCheck className="h-5 w-5 text-success" />
-              </div>
-              <CardDescription>Authentication & active session status</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3.5 text-xs">
-              <div className="flex items-center justify-between pb-2 border-b border-border/40">
-                <span className="text-muted-foreground">Auth Role:</span>
-                <Badge variant={user?.role === "ADMIN" ? "danger" : "primary"}>
-                  {user?.role || "USER"}
-                </Badge>
-              </div>
-              <div className="flex items-center justify-between pb-2 border-b border-border/40">
-                <span className="text-muted-foreground">Session Token:</span>
-                <span className="font-semibold text-foreground">HTTP-Only Cookie (Encrypted)</span>
-              </div>
-              <div className="flex items-center justify-between pb-2 border-b border-border/40">
-                <span className="text-muted-foreground">Base Currency:</span>
-                <span className="font-bold text-foreground">{user?.currency || "INR"}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Timezone:</span>
-                <span className="font-medium text-foreground">{user?.timezone || "Asia/Kolkata"}</span>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle>Connected Wallets</CardTitle>
-                <CreditCard className="h-5 w-5 text-primary" />
-              </div>
-              <CardDescription>Accounts & payment methods</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3 text-xs">
-              <div className="p-3 rounded-lg border border-border bg-secondary/30 flex items-center justify-between">
+          {/* Grid Layout: Recent Transactions & Account Breakdown */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Recent Transactions Table */}
+            <Card className="lg:col-span-2 overflow-hidden border border-border">
+              <CardHeader className="flex flex-row items-center justify-between border-b border-border pb-4">
                 <div>
-                  <p className="font-bold text-foreground">HDFC Salary Account</p>
-                  <p className="text-[11px] text-muted-foreground">Primary Checking • **** 4920</p>
+                  <CardTitle>Recent Transactions</CardTitle>
+                  <CardDescription>
+                    Latest financial activity recorded in your accounts
+                  </CardDescription>
                 </div>
-                <span className="font-extrabold text-foreground">{formatCurrency(124500, user?.currency || "INR")}</span>
-              </div>
+                <Link
+                  to="/transactions"
+                  className="text-xs font-semibold text-primary hover:underline flex items-center gap-1"
+                >
+                  <span>View Ledger</span>
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
+              </CardHeader>
+              <CardContent className="p-0">
+                {data.recentTransactions.length === 0 ? (
+                  <div className="p-8 text-center text-xs text-muted-foreground">
+                    No transactions recorded yet.
+                  </div>
+                ) : (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Date</TableHead>
+                        <TableHead>Description</TableHead>
+                        <TableHead>Category</TableHead>
+                        <TableHead>Account</TableHead>
+                        <TableHead className="text-right">Amount</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {data.recentTransactions.map((tx) => {
+                        const isIncome = tx.type === "INCOME";
+                        return (
+                          <TableRow
+                            key={tx._id}
+                            className="hover:bg-secondary/40 transition-colors"
+                          >
+                            <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
+                              <div className="flex items-center gap-1.5">
+                                <Calendar className="h-3.5 w-3.5 opacity-70" />
+                                <span>{formatDate(tx.date)}</span>
+                              </div>
+                            </TableCell>
+                            <TableCell className="font-semibold text-foreground text-xs">
+                              {tx.description}
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-1.5">
+                                <div
+                                  className="h-2 w-2 rounded-full"
+                                  style={{
+                                    backgroundColor: tx.category?.color || "#3B82F6",
+                                  }}
+                                />
+                                <span className="text-xs font-medium text-foreground">
+                                  {tx.category?.name || "General"}
+                                </span>
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-xs text-muted-foreground">
+                              {tx.account?.name || "Account"}
+                            </TableCell>
+                            <TableCell
+                              className={`text-right font-bold text-xs whitespace-nowrap ${
+                                isIncome ? "text-emerald-500" : "text-rose-500"
+                              }`}
+                            >
+                              {isIncome ? "+" : "-"}
+                              {formatCurrency(
+                                tx.amount,
+                                tx.account?.currency || currency
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                )}
+              </CardContent>
+            </Card>
 
-              <div className="p-3 rounded-lg border border-border bg-secondary/30 flex items-center justify-between">
-                <div>
-                  <p className="font-bold text-foreground">ICICI Amazon Pay</p>
-                  <p className="text-[11px] text-muted-foreground">Credit Card • **** 1032</p>
-                </div>
-                <span className="font-extrabold text-foreground">{formatCurrency(18200, user?.currency || "INR")}</span>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+            {/* Connected Wallets & Category Analytics Summary */}
+            <div className="space-y-6">
+              {/* Connected Accounts */}
+              <Card className="border border-border">
+                <CardHeader className="flex flex-row items-center justify-between pb-3">
+                  <div>
+                    <CardTitle>Connected Wallets</CardTitle>
+                    <CardDescription>Real-time account balances</CardDescription>
+                  </div>
+                  <Link
+                    to="/accounts"
+                    className="text-xs font-semibold text-primary hover:underline"
+                  >
+                    Manage
+                  </Link>
+                </CardHeader>
+                <CardContent className="space-y-2.5 text-xs">
+                  {data.accounts.length === 0 ? (
+                    <p className="text-muted-foreground text-center py-4">
+                      No connected accounts.
+                    </p>
+                  ) : (
+                    data.accounts.map((acc) => {
+                      const IconComponent = ACCOUNT_ICONS[acc.type] || Wallet;
+                      return (
+                        <div
+                          key={acc._id}
+                          className="p-3 rounded-xl border border-border bg-secondary/30 flex items-center justify-between hover:bg-secondary/50 transition-colors"
+                        >
+                          <div className="flex items-center gap-2.5">
+                            <div className="p-2 rounded-lg bg-primary/10 text-primary">
+                              <IconComponent className="h-4 w-4" />
+                            </div>
+                            <div>
+                              <p className="font-bold text-foreground">{acc.name}</p>
+                              <p className="text-[11px] text-muted-foreground">
+                                {acc.type.replace("_", " ")}
+                              </p>
+                            </div>
+                          </div>
+                          <span className="font-extrabold text-foreground">
+                            {formatCurrency(acc.currentBalance, acc.currency)}
+                          </span>
+                        </div>
+                      );
+                    })
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Expense Category Breakdown */}
+              {data.categoryBreakdown.length > 0 && (
+                <Card className="border border-border">
+                  <CardHeader className="pb-3">
+                    <CardTitle>Top Expense Categories</CardTitle>
+                    <CardDescription>
+                      Distribution of spendings in selected period
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-3 text-xs">
+                    {data.categoryBreakdown.slice(0, 4).map((cat) => (
+                      <div key={cat.categoryId} className="space-y-1.5">
+                        <div className="flex items-center justify-between">
+                          <span className="font-medium text-foreground">
+                            {cat.name}
+                          </span>
+                          <span className="font-bold text-foreground">
+                            {formatCurrency(cat.amount, currency)} ({cat.percentage}%)
+                          </span>
+                        </div>
+                        <Progress
+                          value={cat.percentage}
+                          size="sm"
+                          className="bg-secondary"
+                        />
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };

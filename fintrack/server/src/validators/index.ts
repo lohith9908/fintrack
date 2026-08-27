@@ -3,3 +3,4 @@ export * from "./user.validator";
 export * from "./account.validator";
 export * from "./category.validator";
 export * from "./transaction.validator";
+export * from "./dashboard.validator";
