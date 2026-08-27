@@ -1,2 +1,2 @@
-// Scaffolding for controllers
-export {};
+export * from "./auth.controller";
+export * from "./admin.controller";

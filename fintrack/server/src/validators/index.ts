@@ -1,2 +1,1 @@
-// Scaffolding for Zod validators
-export {};
+export * from "./auth.validator";

@@ -14,17 +14,19 @@ export const connectDatabase = async (options?: DatabaseOptions): Promise<typeof
   const mongoUri = env.MONGO_URI;
 
   // Set Mongoose connection event listeners once
-  mongoose.connection.on("connected", () => {
-    logger.info("📦 Connected to MongoDB successfully");
-  });
+  if (mongoose.connection.listenerCount("connected") === 0) {
+    mongoose.connection.on("connected", () => {
+      logger.info("📦 Connected to MongoDB successfully");
+    });
 
-  mongoose.connection.on("error", (err) => {
-    logger.error("❌ MongoDB connection error:", err.message);
-  });
+    mongoose.connection.on("error", (err) => {
+      logger.error("❌ MongoDB connection error:", err.message);
+    });
 
-  mongoose.connection.on("disconnected", () => {
-    logger.warn("⚠️ MongoDB disconnected");
-  });
+    mongoose.connection.on("disconnected", () => {
+      logger.warn("⚠️ MongoDB disconnected");
+    });
+  }
 
   try {
     const conn = await mongoose.connect(mongoUri, {
@@ -33,12 +35,10 @@ export const connectDatabase = async (options?: DatabaseOptions): Promise<typeof
     return conn;
   } catch (error) {
     const errMessage = error instanceof Error ? error.message : String(error);
-    logger.error(`❌ Initial MongoDB connection attempt failed: ${errMessage}`);
+    logger.error(`❌ MongoDB connection to ${mongoUri} failed: ${errMessage}`);
     if (env.NODE_ENV === "production") {
       throw error;
     }
-    // In development mode, log warning so dev server can still serve health check while DB starts
-    logger.warn("⚠️ Server started without active MongoDB connection. Start MongoDB or inspect via MongoDB Compass.");
     return null;
   }
 };

@@ -9,7 +9,11 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "seed": "tsx src/seed/seed.ts",
+    "test:db": "tsx src/tests/verifyDbConnection.ts",
     "test:models": "tsx src/tests/verifyModels.ts",
+    "test:auth": "tsx src/tests/verifyAuth.ts",
+    "test:e2e": "tsx src/tests/e2eAuth.test.ts",
+    "test:phase5": "tsx src/tests/e2ePhase5.test.ts",
     "lint": "eslint src --ext .ts",
     "typecheck": "tsc --noEmit"
   },
@@ -38,6 +42,7 @@
     "@typescript-eslint/eslint-plugin": "^7.18.0",
     "@typescript-eslint/parser": "^7.18.0",
     "eslint": "^8.57.1",
+    "mongodb-memory-server": "^11.2.0",
     "tsx": "^4.19.3",
     "typescript": "^5.7.3"
   }
