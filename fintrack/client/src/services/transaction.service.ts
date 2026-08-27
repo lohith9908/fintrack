@@ -1,10 +1,10 @@
 import { api } from "./api";
 import {
   ITransaction,
-  TransactionSummary,
   CreateTransactionPayload,
   UpdateTransactionPayload,
-  TransactionType,
+  TransactionFilterParams,
+  PaginatedTransactionsResponse,
 } from "../types/transaction.types";
 
 interface ApiResponse<T> {
@@ -15,16 +15,15 @@ interface ApiResponse<T> {
 
 export class TransactionService {
   /**
-   * Get all transactions for the user with calculated financial summary
+   * Get all transactions with search, filters, and pagination
    */
-  public static async getTransactions(params?: {
-    type?: TransactionType;
-    account?: string;
-    category?: string;
-  }): Promise<{ transactions: ITransaction[]; summary: TransactionSummary }> {
-    const res = await api.get<
-      ApiResponse<{ transactions: ITransaction[]; summary: TransactionSummary }>
-    >("/transactions", { params });
+  public static async getTransactions(
+    params?: TransactionFilterParams
+  ): Promise<PaginatedTransactionsResponse> {
+    const res = await api.get<ApiResponse<PaginatedTransactionsResponse>>(
+      "/transactions",
+      { params }
+    );
     return res.data.data;
   }
 
@@ -71,5 +70,56 @@ export class TransactionService {
   public static async deleteTransaction(id: string): Promise<{ message: string }> {
     const res = await api.delete<ApiResponse<null>>(`/transactions/${id}`);
     return { message: res.data.message };
+  }
+
+  /**
+   * Upload receipt attachment for a transaction
+   */
+  public static async uploadReceipt(
+    transactionId: string,
+    file: File
+  ): Promise<ITransaction> {
+    const formData = new FormData();
+    formData.append("receipt", file);
+
+    const res = await api.post<ApiResponse<{ transaction: ITransaction }>>(
+      `/transactions/${transactionId}/receipt`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    return res.data.data.transaction;
+  }
+
+  /**
+   * Download / View authenticated receipt blob
+   */
+  public static async getReceiptBlob(
+    transactionId: string
+  ): Promise<{ blob: Blob; url: string }> {
+    const res = await api.get(`/transactions/${transactionId}/receipt`, {
+      responseType: "blob",
+    });
+    const contentType = typeof res.headers["content-type"] === "string" ? res.headers["content-type"] : "application/octet-stream";
+    const blob = new Blob([res.data], {
+      type: contentType,
+    });
+    const url = URL.createObjectURL(blob);
+    return { blob, url };
+  }
+
+  /**
+   * Delete receipt attachment from transaction
+   */
+  public static async deleteReceipt(
+    transactionId: string
+  ): Promise<ITransaction> {
+    const res = await api.delete<ApiResponse<{ transaction: ITransaction }>>(
+      `/transactions/${transactionId}/receipt`
+    );
+    return res.data.data.transaction;
   }
 }

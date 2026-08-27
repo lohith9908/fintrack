@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
   Plus,
   ArrowUpRight,
@@ -14,6 +14,13 @@ import {
   Smartphone,
   Layers,
   FileText,
+  Search,
+  Filter,
+  X,
+  Paperclip,
+  UploadCloud,
+  Download,
+  FileSpreadsheet,
 } from "lucide-react";
 import { TransactionService } from "../../services/transaction.service";
 import { AccountService } from "../../services/account.service";
@@ -23,7 +30,9 @@ import {
   TransactionSummary,
   TransactionType,
   PaymentMethod,
+  PaginationMeta,
   CreateTransactionPayload,
+  TransactionFilterParams,
 } from "../../types/transaction.types";
 import { IAccount } from "../../types/account.types";
 import { ICategory } from "../../types/category.types";
@@ -47,7 +56,9 @@ import {
   TableHead,
   TableCell,
   Dialog,
+  Drawer,
   Dropdown,
+  Pagination,
   Skeleton,
   EmptyState,
   ErrorState,
@@ -76,15 +87,45 @@ const PAYMENT_METHOD_ICONS: Record<PaymentMethod, React.FC<{ className?: string 
 
 export const TransactionsPage: React.FC = () => {
   const toast = useToast();
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   // Transactions State
   const [transactions, setTransactions] = useState<ITransaction[]>([]);
   const [summary, setSummary] = useState<TransactionSummary | null>(null);
+  const [pagination, setPagination] = useState<PaginationMeta>({
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 1,
+    hasNextPage: false,
+    hasPrevPage: false,
+  });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState("all");
 
-  // Supporting Data
+  // Filters State
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeTab, setActiveTab] = useState("all");
+  const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
+  const [filters, setFilters] = useState<{
+    startDate: string;
+    endDate: string;
+    category: string;
+    account: string;
+    paymentMethod: string;
+    minAmount: string;
+    maxAmount: string;
+  }>({
+    startDate: "",
+    endDate: "",
+    category: "",
+    account: "",
+    paymentMethod: "",
+    minAmount: "",
+    maxAmount: "",
+  });
+
+  // Supporting Dropdown Data
   const [accounts, setAccounts] = useState<IAccount[]>([]);
   const [categories, setCategories] = useState<ICategory[]>([]);
 
@@ -94,6 +135,11 @@ export const TransactionsPage: React.FC = () => {
   const [viewingTransaction, setViewingTransaction] = useState<ITransaction | null>(null);
   const [transactionToDelete, setTransactionToDelete] = useState<ITransaction | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Receipt Upload State
+  const [selectedReceiptFile, setSelectedReceiptFile] = useState<File | null>(null);
+  const [isReceiptLoading, setIsReceiptLoading] = useState(false);
+  const [receiptBlobUrl, setReceiptBlobUrl] = useState<string | null>(null);
 
   // Form State
   const [formData, setFormData] = useState<{
@@ -116,21 +162,54 @@ export const TransactionsPage: React.FC = () => {
     notes: "",
   });
 
-  // Load Transactions
-  const loadTransactions = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      const data = await TransactionService.getTransactions();
-      setTransactions(data.transactions);
-      setSummary(data.summary);
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Failed to load transactions";
-      setError(msg);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  // Fetch Transactions with Active Filters & Pagination
+  const loadTransactions = useCallback(
+    async (pageToLoad = pagination.page) => {
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        const params: TransactionFilterParams = {
+          page: pageToLoad,
+          limit: pagination.limit,
+        };
+
+        if (searchQuery.trim()) params.search = searchQuery.trim();
+        if (activeTab === "income") params.type = "INCOME";
+        if (activeTab === "expense") params.type = "EXPENSE";
+        if (filters.category) params.category = filters.category;
+        if (filters.account) params.account = filters.account;
+        if (filters.paymentMethod) params.paymentMethod = filters.paymentMethod as PaymentMethod;
+        if (filters.startDate) params.startDate = filters.startDate;
+        if (filters.endDate) params.endDate = filters.endDate;
+        if (filters.minAmount) params.minAmount = Number(filters.minAmount);
+        if (filters.maxAmount) params.maxAmount = Number(filters.maxAmount);
+
+        const data = await TransactionService.getTransactions(params);
+        setTransactions(data.transactions);
+        setSummary(data.summary);
+        setPagination(data.pagination);
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : "Failed to load transactions";
+        setError(msg);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [
+      pagination.page,
+      pagination.limit,
+      searchQuery,
+      activeTab,
+      filters.category,
+      filters.account,
+      filters.paymentMethod,
+      filters.startDate,
+      filters.endDate,
+      filters.minAmount,
+      filters.maxAmount,
+    ]
+  );
 
   // Load Accounts and Categories for Dropdowns
   const loadMetadata = useCallback(async () => {
@@ -147,16 +226,28 @@ export const TransactionsPage: React.FC = () => {
   }, [toast]);
 
   useEffect(() => {
-    loadTransactions();
     loadMetadata();
-  }, [loadTransactions, loadMetadata]);
+  }, [loadMetadata]);
 
-  // Filter transactions by tab
-  const filteredTransactions = transactions.filter((t) => {
-    if (activeTab === "income") return t.type === "INCOME";
-    if (activeTab === "expense") return t.type === "EXPENSE";
-    return true;
-  });
+  useEffect(() => {
+    loadTransactions(1);
+  }, [searchQuery, activeTab, filters, loadTransactions]);
+
+  // Active filter count
+  const activeFilterCount = Object.values(filters).filter((val) => Boolean(val)).length;
+
+  const handleClearFilters = () => {
+    setFilters({
+      startDate: "",
+      endDate: "",
+      category: "",
+      account: "",
+      paymentMethod: "",
+      minAmount: "",
+      maxAmount: "",
+    });
+    setSearchQuery("");
+  };
 
   // Dynamic Categories matching current selected type
   const availableCategories = categories.filter(
@@ -166,6 +257,7 @@ export const TransactionsPage: React.FC = () => {
   // Open Add Modal
   const handleOpenAdd = () => {
     setEditingTransaction(null);
+    setSelectedReceiptFile(null);
     const defaultAcc = accounts[0]?._id || "";
     const defaultCat = categories.find((c) => c.type === "EXPENSE")?._id || "";
 
@@ -185,6 +277,7 @@ export const TransactionsPage: React.FC = () => {
   // Open Edit Modal
   const handleOpenEdit = (txn: ITransaction) => {
     setEditingTransaction(txn);
+    setSelectedReceiptFile(null);
     setFormData({
       amount: txn.amount,
       type: txn.type,
@@ -233,16 +326,31 @@ export const TransactionsPage: React.FC = () => {
         notes: formData.notes.trim() || undefined,
       };
 
+      let savedTxn: ITransaction;
       if (editingTransaction) {
-        await TransactionService.updateTransaction(editingTransaction._id, payload);
+        savedTxn = await TransactionService.updateTransaction(
+          editingTransaction._id,
+          payload
+        );
         toast.success("Transaction updated successfully");
       } else {
-        await TransactionService.createTransaction(payload);
+        savedTxn = await TransactionService.createTransaction(payload);
         toast.success("Transaction recorded successfully");
       }
 
+      // If a receipt file was chosen in the modal, upload it now
+      if (selectedReceiptFile && savedTxn) {
+        try {
+          await TransactionService.uploadReceipt(savedTxn._id, selectedReceiptFile);
+          toast.success("Receipt attached successfully");
+        } catch {
+          toast.warning("Transaction saved, but receipt upload failed");
+        }
+      }
+
       setIsAddModalOpen(false);
-      loadTransactions();
+      setSelectedReceiptFile(null);
+      loadTransactions(1);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Failed to save transaction";
       toast.error(msg);
@@ -258,10 +366,39 @@ export const TransactionsPage: React.FC = () => {
       const res = await TransactionService.deleteTransaction(transactionToDelete._id);
       toast.success(res.message);
       setTransactionToDelete(null);
-      loadTransactions();
+      loadTransactions(pagination.page);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Failed to delete transaction";
       toast.error(msg);
+    }
+  };
+
+  // View Receipt Blob
+  const handleViewReceipt = async (txn: ITransaction) => {
+    try {
+      setIsReceiptLoading(true);
+      const { url } = await TransactionService.getReceiptBlob(txn._id);
+      setReceiptBlobUrl(url);
+    } catch {
+      toast.error("Failed to load receipt file");
+    } finally {
+      setIsReceiptLoading(false);
+    }
+  };
+
+  // Delete Receipt
+  const handleDeleteReceipt = async (txn: ITransaction) => {
+    try {
+      setIsReceiptLoading(true);
+      const updated = await TransactionService.deleteReceipt(txn._id);
+      setViewingTransaction(updated);
+      setReceiptBlobUrl(null);
+      toast.success("Receipt attachment removed");
+      loadTransactions(pagination.page);
+    } catch {
+      toast.error("Failed to remove receipt");
+    } finally {
+      setIsReceiptLoading(false);
     }
   };
 
@@ -272,13 +409,13 @@ export const TransactionsPage: React.FC = () => {
         <div className="space-y-1">
           <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
             <FileText className="h-3 w-3" />
-            <span>Phase 9 Core Ledger</span>
+            <span>Phase 10 Search, Filters & Receipts</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
             Transactions & Ledger
           </h1>
           <p className="text-xs sm:text-sm text-muted-foreground">
-            Record, track, and monitor all your income earnings and daily expenses.
+            Searchable, filterable income and expense records with receipt attachments.
           </p>
         </div>
 
@@ -389,23 +526,144 @@ export const TransactionsPage: React.FC = () => {
         </div>
       )}
 
-      {/* Tabs */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <Tabs
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-          variant="pill"
-          tabs={[
-            { id: "all", label: "All Transactions", badge: transactions.length.toString() },
-            { id: "expense", label: "Expenses", badge: transactions.filter((t) => t.type === "EXPENSE").length.toString() },
-            { id: "income", label: "Income", badge: transactions.filter((t) => t.type === "INCOME").length.toString() },
-          ]}
-        />
+      {/* Search & Filter Toolbar */}
+      <div className="space-y-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <Tabs
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+            variant="pill"
+            tabs={[
+              { id: "all", label: "All Transactions" },
+              { id: "expense", label: "Expenses" },
+              { id: "income", label: "Income" },
+            ]}
+          />
+
+          <div className="flex items-center gap-2.5">
+            {/* Search Input */}
+            <div className="relative flex-1 md:w-64">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <input
+                type="text"
+                placeholder="Search transactions..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full h-9 pl-9 pr-8 text-xs rounded-xl bg-secondary/50 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              )}
+            </div>
+
+            {/* Filter Toggle Button */}
+            <Button
+              variant={activeFilterCount > 0 ? "primary" : "outline"}
+              size="sm"
+              onClick={() => setIsFilterDrawerOpen(true)}
+              className="flex items-center gap-1.5"
+            >
+              <Filter className="h-3.5 w-3.5" />
+              <span>Filters</span>
+              {activeFilterCount > 0 && (
+                <Badge variant="secondary" size="sm" className="ml-1 bg-white text-black font-bold">
+                  {activeFilterCount}
+                </Badge>
+              )}
+            </Button>
+          </div>
+        </div>
+
+        {/* Active Filter Chips */}
+        {(activeFilterCount > 0 || searchQuery) && (
+          <div className="flex flex-wrap items-center gap-2 pt-1 text-xs">
+            <span className="text-muted-foreground font-medium">Active filters:</span>
+
+            {searchQuery && (
+              <Badge variant="secondary" size="sm" className="flex items-center gap-1">
+                <span>Search: "{searchQuery}"</span>
+                <button onClick={() => setSearchQuery("")}>
+                  <X className="h-3 w-3 hover:text-foreground" />
+                </button>
+              </Badge>
+            )}
+
+            {filters.category && (
+              <Badge variant="secondary" size="sm" className="flex items-center gap-1">
+                <span>
+                  Category: {categories.find((c) => c._id === filters.category)?.name || "Selected"}
+                </span>
+                <button onClick={() => setFilters({ ...filters, category: "" })}>
+                  <X className="h-3 w-3 hover:text-foreground" />
+                </button>
+              </Badge>
+            )}
+
+            {filters.account && (
+              <Badge variant="secondary" size="sm" className="flex items-center gap-1">
+                <span>
+                  Account: {accounts.find((a) => a._id === filters.account)?.name || "Selected"}
+                </span>
+                <button onClick={() => setFilters({ ...filters, account: "" })}>
+                  <X className="h-3 w-3 hover:text-foreground" />
+                </button>
+              </Badge>
+            )}
+
+            {filters.paymentMethod && (
+              <Badge variant="secondary" size="sm" className="flex items-center gap-1">
+                <span>
+                  Method: {PAYMENT_METHOD_LABELS[filters.paymentMethod as PaymentMethod] || filters.paymentMethod}
+                </span>
+                <button onClick={() => setFilters({ ...filters, paymentMethod: "" })}>
+                  <X className="h-3 w-3 hover:text-foreground" />
+                </button>
+              </Badge>
+            )}
+
+            {(filters.startDate || filters.endDate) && (
+              <Badge variant="secondary" size="sm" className="flex items-center gap-1">
+                <span>
+                  Date: {filters.startDate || "Any"} to {filters.endDate || "Any"}
+                </span>
+                <button onClick={() => setFilters({ ...filters, startDate: "", endDate: "" })}>
+                  <X className="h-3 w-3 hover:text-foreground" />
+                </button>
+              </Badge>
+            )}
+
+            {(filters.minAmount || filters.maxAmount) && (
+              <Badge variant="secondary" size="sm" className="flex items-center gap-1">
+                <span>
+                  Amount: ₹{filters.minAmount || "0"} - ₹{filters.maxAmount || "∞"}
+                </span>
+                <button onClick={() => setFilters({ ...filters, minAmount: "", maxAmount: "" })}>
+                  <X className="h-3 w-3 hover:text-foreground" />
+                </button>
+              </Badge>
+            )}
+
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleClearFilters}
+              className="text-xs text-muted-foreground hover:text-foreground h-6 px-2"
+            >
+              Clear All
+            </Button>
+          </div>
+        )}
       </div>
 
-      {/* Transaction List / States */}
+      {/* Transaction Table / List State */}
       {isLoading ? (
         <div className="space-y-3">
+          <Skeleton variant="rectangular" className="h-14 w-full" />
           <Skeleton variant="rectangular" className="h-14 w-full" />
           <Skeleton variant="rectangular" className="h-14 w-full" />
           <Skeleton variant="rectangular" className="h-14 w-full" />
@@ -414,14 +672,18 @@ export const TransactionsPage: React.FC = () => {
         <ErrorState
           title="Could not load transactions"
           message={error}
-          onRetry={loadTransactions}
+          onRetry={() => loadTransactions(1)}
         />
-      ) : filteredTransactions.length === 0 ? (
+      ) : transactions.length === 0 ? (
         <EmptyState
-          title={activeTab === "all" ? "No transactions recorded yet" : `No ${activeTab} transactions found`}
-          description="Start building your financial ledger by adding your income sources or recent expenses."
-          actionLabel="Add Transaction"
-          onAction={handleOpenAdd}
+          title={activeFilterCount > 0 || searchQuery ? "No matching transactions found" : "No transactions recorded yet"}
+          description={
+            activeFilterCount > 0 || searchQuery
+              ? "Try adjusting or clearing your search and filter parameters."
+              : "Start building your financial ledger by adding your income sources or recent expenses."
+          }
+          actionLabel={activeFilterCount > 0 || searchQuery ? "Clear Filters" : "Add Transaction"}
+          onAction={activeFilterCount > 0 || searchQuery ? handleClearFilters : handleOpenAdd}
         />
       ) : (
         <Card className="overflow-hidden border border-border">
@@ -433,12 +695,13 @@ export const TransactionsPage: React.FC = () => {
                   <TableHead>Category</TableHead>
                   <TableHead>Description</TableHead>
                   <TableHead>Account / Method</TableHead>
+                  <TableHead className="w-16 text-center">Receipt</TableHead>
                   <TableHead className="text-right">Amount</TableHead>
                   <TableHead className="w-12 text-center"></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredTransactions.map((txn) => {
+                {transactions.map((txn) => {
                   const isIncome = txn.type === "INCOME";
                   const MethodIcon = PAYMENT_METHOD_ICONS[txn.paymentMethod] || Layers;
 
@@ -488,6 +751,19 @@ export const TransactionsPage: React.FC = () => {
                         </div>
                       </TableCell>
 
+                      <TableCell className="text-center">
+                        {txn.receipt ? (
+                          <span
+                            title="Receipt attached"
+                            className="inline-flex p-1 rounded-md bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                          >
+                            <Paperclip className="h-3.5 w-3.5" />
+                          </span>
+                        ) : (
+                          <span className="text-muted-foreground/30 text-xs">—</span>
+                        )}
+                      </TableCell>
+
                       <TableCell className="text-right whitespace-nowrap">
                         <span
                           className={`text-sm font-bold tracking-tight ${
@@ -514,7 +790,10 @@ export const TransactionsPage: React.FC = () => {
                               id: "view",
                               label: "View Details",
                               icon: <Eye className="h-3.5 w-3.5" />,
-                              onClick: () => setViewingTransaction(txn),
+                              onClick: () => {
+                                setViewingTransaction(txn);
+                                setReceiptBlobUrl(null);
+                              },
                             },
                             {
                               id: "edit",
@@ -538,8 +817,118 @@ export const TransactionsPage: React.FC = () => {
               </TableBody>
             </Table>
           </div>
+
+          {/* Pagination Controls */}
+          <div className="p-4 border-t border-border">
+            <Pagination
+              currentPage={pagination.page}
+              totalPages={pagination.totalPages}
+              onPageChange={(p) => loadTransactions(p)}
+              totalItems={pagination.total}
+              pageSize={pagination.limit}
+            />
+          </div>
         </Card>
       )}
+
+      {/* Filter Drawer */}
+      <Drawer
+        isOpen={isFilterDrawerOpen}
+        onClose={() => setIsFilterDrawerOpen(false)}
+        title="Filter Transactions"
+        description="Filter your transaction records by custom dates, category, account, and amount range."
+        placement="right"
+      >
+        <div className="space-y-5 p-4">
+          {/* Category Filter */}
+          <Select
+            label="Category"
+            value={filters.category}
+            onChange={(e) => setFilters({ ...filters, category: e.target.value })}
+            options={[
+              { value: "", label: "All Categories" },
+              ...categories.map((c) => ({ value: c._id, label: `${c.name} (${c.type})` })),
+            ]}
+          />
+
+          {/* Account Filter */}
+          <Select
+            label="Account / Wallet"
+            value={filters.account}
+            onChange={(e) => setFilters({ ...filters, account: e.target.value })}
+            options={[
+              { value: "", label: "All Accounts" },
+              ...accounts.map((a) => ({ value: a._id, label: `${a.name} (${a.type})` })),
+            ]}
+          />
+
+          {/* Payment Method Filter */}
+          <Select
+            label="Payment Method"
+            value={filters.paymentMethod}
+            onChange={(e) => setFilters({ ...filters, paymentMethod: e.target.value })}
+            options={[
+              { value: "", label: "All Methods" },
+              { value: "UPI", label: "UPI" },
+              { value: "CASH", label: "Cash" },
+              { value: "CREDIT_CARD", label: "Credit Card" },
+              { value: "DEBIT_CARD", label: "Debit Card" },
+              { value: "BANK_TRANSFER", label: "Bank Transfer" },
+              { value: "OTHER", label: "Other" },
+            ]}
+          />
+
+          {/* Date Range Filter */}
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-foreground">Date Range</label>
+            <div className="grid grid-cols-2 gap-2">
+              <DatePicker
+                label="Start Date"
+                value={filters.startDate}
+                onChange={(e) => setFilters({ ...filters, startDate: e.target.value })}
+              />
+              <DatePicker
+                label="End Date"
+                value={filters.endDate}
+                onChange={(e) => setFilters({ ...filters, endDate: e.target.value })}
+              />
+            </div>
+          </div>
+
+          {/* Amount Range Filter */}
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-foreground">Amount Range (₹)</label>
+            <div className="grid grid-cols-2 gap-2">
+              <CurrencyInput
+                label="Min Amount"
+                value={filters.minAmount}
+                onChangeValue={(val) => setFilters({ ...filters, minAmount: val ? val.toString() : "" })}
+                placeholder="Min ₹"
+              />
+              <CurrencyInput
+                label="Max Amount"
+                value={filters.maxAmount}
+                onChangeValue={(val) => setFilters({ ...filters, maxAmount: val ? val.toString() : "" })}
+                placeholder="Max ₹"
+              />
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="pt-4 border-t border-border flex items-center justify-between gap-3">
+            <Button variant="outline" size="sm" onClick={handleClearFilters}>
+              Reset Filters
+            </Button>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => setIsFilterDrawerOpen(false)}
+            >
+              Apply Filters
+            </Button>
+          </div>
+        </div>
+      </Drawer>
 
       {/* Add / Edit Transaction Modal Dialog */}
       <Dialog
@@ -671,6 +1060,61 @@ export const TransactionsPage: React.FC = () => {
             maxCharacters={500}
           />
 
+          {/* Receipt Upload Dropzone */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-foreground">
+              Attach Receipt (Optional - JPG, PNG, WEBP, PDF up to 5MB)
+            </label>
+            <input
+              type="file"
+              ref={fileInputRef}
+              accept=".jpg,.jpeg,.png,.webp,.pdf"
+              className="hidden"
+              onChange={(e) => {
+                if (e.target.files?.[0]) {
+                  const file = e.target.files[0];
+                  if (file.size > 5 * 1024 * 1024) {
+                    toast.error("File exceeds maximum allowed size of 5 MB");
+                    return;
+                  }
+                  setSelectedReceiptFile(file);
+                }
+              }}
+            />
+
+            {selectedReceiptFile ? (
+              <div className="p-3 rounded-xl border border-primary/30 bg-primary/5 flex items-center justify-between">
+                <div className="flex items-center gap-2 text-xs">
+                  <Paperclip className="h-4 w-4 text-primary" />
+                  <span className="font-semibold text-foreground line-clamp-1">
+                    {selectedReceiptFile.name}
+                  </span>
+                  <span className="text-muted-foreground">
+                    ({(selectedReceiptFile.size / 1024).toFixed(1)} KB)
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setSelectedReceiptFile(null)}
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="w-full p-4 rounded-xl border border-dashed border-border hover:border-primary/40 bg-secondary/20 hover:bg-secondary/40 transition-colors flex flex-col items-center justify-center gap-1 text-center"
+              >
+                <UploadCloud className="h-5 w-5 text-muted-foreground" />
+                <span className="text-xs font-semibold text-foreground">
+                  Click to select receipt document
+                </span>
+              </button>
+            )}
+          </div>
+
           {/* Dialog Action Buttons */}
           <div className="flex items-center justify-end gap-3 pt-4 border-t border-border">
             <Button
@@ -694,7 +1138,7 @@ export const TransactionsPage: React.FC = () => {
           isOpen={true}
           onClose={() => setViewingTransaction(null)}
           title="Transaction Details"
-          description="Complete financial audit metadata for this record."
+          description="Complete financial audit metadata and attached receipts."
         >
           <div className="space-y-4">
             <div className="p-4 rounded-xl bg-card border border-border flex items-center justify-between">
@@ -768,6 +1212,87 @@ export const TransactionsPage: React.FC = () => {
               </div>
             )}
 
+            {/* Receipt Section */}
+            <div className="pt-3 border-t border-border space-y-2">
+              <span className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                <Paperclip className="h-3.5 w-3.5 text-primary" />
+                <span>Receipt Attachment</span>
+              </span>
+
+              {viewingTransaction.receipt ? (
+                <div className="space-y-3">
+                  <div className="p-3 rounded-xl border border-border bg-secondary/30 flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-2">
+                      <FileSpreadsheet className="h-4 w-4 text-primary" />
+                      <div>
+                        <span className="font-medium text-foreground block line-clamp-1">
+                          {viewingTransaction.receipt.originalName || "Receipt Attachment"}
+                        </span>
+                        <span className="text-[11px] text-muted-foreground">
+                          {viewingTransaction.receipt.mimeType} •{" "}
+                          {viewingTransaction.receipt.size
+                            ? `${(viewingTransaction.receipt.size / 1024).toFixed(1)} KB`
+                            : "Uploaded"}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleViewReceipt(viewingTransaction)}
+                        isLoading={isReceiptLoading}
+                        className="h-7 text-xs flex items-center gap-1"
+                      >
+                        <Eye className="h-3 w-3" />
+                        <span>Preview</span>
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDeleteReceipt(viewingTransaction)}
+                        isLoading={isReceiptLoading}
+                        className="h-7 text-xs text-rose-500 hover:text-rose-600"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Inline Preview if Loaded */}
+                  {receiptBlobUrl && (
+                    <div className="p-2 rounded-xl border border-border bg-card">
+                      {viewingTransaction.receipt.mimeType?.includes("pdf") ? (
+                        <div className="p-4 text-center space-y-2">
+                          <p className="text-xs text-muted-foreground">PDF Document Ready</p>
+                          <a
+                            href={receiptBlobUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary underline"
+                          >
+                            <Download className="h-3.5 w-3.5" />
+                            <span>Download / Open PDF</span>
+                          </a>
+                        </div>
+                      ) : (
+                        <img
+                          src={receiptBlobUrl}
+                          alt="Receipt Preview"
+                          className="max-h-60 rounded-lg object-contain mx-auto"
+                        />
+                      )}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="p-3 rounded-xl border border-dashed border-border text-center text-xs text-muted-foreground">
+                  No receipt attached to this transaction.
+                </div>
+              )}
+            </div>
+
             <div className="flex items-center justify-end gap-3 pt-4 border-t border-border">
               <Button
                 variant="outline"
@@ -798,7 +1323,7 @@ export const TransactionsPage: React.FC = () => {
         onClose={() => setTransactionToDelete(null)}
         onConfirm={handleConfirmDelete}
         title="Delete Transaction Record?"
-        message={`Are you sure you want to permanently delete "${transactionToDelete?.description}"? Your account balance and financial totals will be recalculated automatically.`}
+        message={`Are you sure you want to permanently delete "${transactionToDelete?.description}"? Any attached receipt files will also be removed, and your account balance will be recalculated automatically.`}
         confirmLabel="Delete Transaction"
         variant="danger"
       />

@@ -4,8 +4,9 @@ import { ApiResponse } from "../utils/apiResponse";
 import {
   createTransactionSchema,
   updateTransactionSchema,
+  getTransactionsQuerySchema,
 } from "../validators/transaction.validator";
-import { TransactionType } from "../types/database.types";
+import { BadRequestError } from "../utils/apiError";
 
 export class TransactionController {
   /**
@@ -18,15 +19,12 @@ export class TransactionController {
   ): Promise<void> {
     try {
       const userId = req.user!._id.toString();
-      const type = req.query.type as TransactionType | undefined;
-      const account = req.query.account as string | undefined;
-      const category = req.query.category as string | undefined;
+      const validatedQuery = getTransactionsQuerySchema.parse(req.query);
 
-      const result = await TransactionService.getTransactions(userId, {
-        type,
-        account,
-        category,
-      });
+      const result = await TransactionService.getTransactions(
+        userId,
+        validatedQuery
+      );
 
       ApiResponse.success(res, "Transactions retrieved successfully", result);
     } catch (error) {
@@ -129,6 +127,89 @@ export class TransactionController {
       );
 
       ApiResponse.success(res, result.message);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * POST /api/transactions/:id/receipt
+   */
+  public static async uploadReceipt(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const userId = req.user!._id.toString();
+      const transactionId = req.params.id;
+
+      if (!req.file) {
+        throw new BadRequestError("No receipt file was uploaded.");
+      }
+
+      const transaction = await TransactionService.uploadReceipt(
+        userId,
+        transactionId,
+        req.file
+      );
+
+      ApiResponse.success(res, "Receipt uploaded successfully", {
+        transaction,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * GET /api/transactions/:id/receipt (Authorized download/stream)
+   */
+  public static async getReceipt(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const userId = req.user!._id.toString();
+      const transactionId = req.params.id;
+
+      const receipt = await TransactionService.getReceiptFile(
+        userId,
+        transactionId
+      );
+
+      res.setHeader("Content-Type", receipt.mimeType);
+      res.setHeader(
+        "Content-Disposition",
+        `inline; filename="${receipt.originalName}"`
+      );
+      res.sendFile(receipt.filePath);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * DELETE /api/transactions/:id/receipt
+   */
+  public static async deleteReceipt(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const userId = req.user!._id.toString();
+      const transactionId = req.params.id;
+
+      const transaction = await TransactionService.deleteReceipt(
+        userId,
+        transactionId
+      );
+
+      ApiResponse.success(res, "Receipt deleted successfully", {
+        transaction,
+      });
     } catch (error) {
       next(error);
     }

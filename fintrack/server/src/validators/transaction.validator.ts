@@ -64,5 +64,22 @@ export const updateTransactionSchema = z.object({
   notes: z.string().trim().max(500, "Notes cannot exceed 500 characters").optional(),
 });
 
+export const getTransactionsQuerySchema = z.object({
+  search: z.string().trim().optional(),
+  type: z.enum(["INCOME", "EXPENSE"]).optional(),
+  category: z.string().trim().optional(),
+  account: z.string().trim().optional(),
+  paymentMethod: z
+    .enum(["CASH", "UPI", "CREDIT_CARD", "DEBIT_CARD", "BANK_TRANSFER", "OTHER"])
+    .optional(),
+  startDate: z.string().trim().optional(),
+  endDate: z.string().trim().optional(),
+  minAmount: z.coerce.number().min(0).optional(),
+  maxAmount: z.coerce.number().min(0).optional(),
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(100).default(10),
+});
+
 export type CreateTransactionInput = z.infer<typeof createTransactionSchema>;
 export type UpdateTransactionInput = z.infer<typeof updateTransactionSchema>;
+export type GetTransactionsQueryInput = z.infer<typeof getTransactionsQuerySchema>;
