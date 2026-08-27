@@ -24,7 +24,8 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
     ref
   ) => {
     const textareaId = id || (label ? label.toLowerCase().replace(/\s+/g, "-") : undefined);
-    const charCount = typeof value === "string" ? value.length : 0;
+    const textVal = value !== undefined ? value : props.defaultValue;
+    const charCount = typeof textVal === "string" ? textVal.length : 0;
 
     return (
       <div className="w-full space-y-1.5">
@@ -39,7 +40,7 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
           )}
           {maxCharacters && (
             <span className="text-[11px] text-muted-foreground">
-              {charCount}/{maxCharacters}
+              {`${charCount}/${maxCharacters}`}
             </span>
           )}
         </div>

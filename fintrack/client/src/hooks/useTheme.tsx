@@ -11,6 +11,9 @@ export const ThemeProvider: React.FC<{
   defaultTheme?: Theme;
 }> = ({ children, defaultTheme = "system" }) => {
   const [theme, setThemeState] = useState<Theme>(() => {
+    if (typeof window === "undefined" || typeof localStorage === "undefined") {
+      return defaultTheme;
+    }
     const stored = localStorage.getItem(THEME_STORAGE_KEY) as Theme | null;
     return stored || defaultTheme;
   });
@@ -24,6 +27,8 @@ export const ThemeProvider: React.FC<{
   });
 
   useEffect(() => {
+    if (typeof window === "undefined" || typeof document === "undefined") return;
+
     const root = document.documentElement;
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
@@ -53,7 +58,9 @@ export const ThemeProvider: React.FC<{
   }, [theme]);
 
   const setTheme = (newTheme: Theme) => {
-    localStorage.setItem(THEME_STORAGE_KEY, newTheme);
+    if (typeof localStorage !== "undefined") {
+      localStorage.setItem(THEME_STORAGE_KEY, newTheme);
+    }
     setThemeState(newTheme);
   };
 

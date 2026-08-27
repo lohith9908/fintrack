@@ -87,14 +87,20 @@ export const AppRoutes: React.FC = () => {
         </Route>
 
         {/* ============================================================ */}
-        {/* 2. Protected Application Routes (ProtectedRoute)             */}
+        {/* 2. Design System Showcase & Shell View                       */}
+        {/* ============================================================ */}
+        <Route element={<AppLayout />}>
+          <Route path="/design-system" element={<DesignSystemShowcase />} />
+        </Route>
+
+        {/* ============================================================ */}
+        {/* 3. Protected Application Routes (ProtectedRoute)             */}
         {/* ============================================================ */}
         <Route element={<ProtectedRoute />}>
           <Route element={<AppLayout />}>
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/settings" element={<SettingsPage />} />
-            <Route path="/design-system" element={<DesignSystemShowcase />} />
 
             <Route
               path="/transactions"
