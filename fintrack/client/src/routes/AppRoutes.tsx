@@ -16,6 +16,7 @@ import {
   DesignSystemShowcase,
   AccountsPage,
   TransactionsPage,
+  BudgetsPage,
 } from "../pages";
 
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "../components/ui/Card";
@@ -106,16 +107,7 @@ export const AppRoutes: React.FC = () => {
 
             <Route path="/transactions" element={<TransactionsPage />} />
             <Route path="/accounts" element={<AccountsPage />} />
-            <Route
-              path="/budgets"
-              element={
-                <PhaseShellPlaceholder
-                  title="Monthly Budgets & Alerts"
-                  phase="Phase 13"
-                  description="Category budget allocation and deterministic threshold monitoring."
-                />
-              }
-            />
+            <Route path="/budgets" element={<BudgetsPage />} />
             <Route
               path="/recurring"
               element={

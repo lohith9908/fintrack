@@ -14,6 +14,7 @@ import {
   BadRequestError,
 } from "../utils/apiError";
 import { RECEIPT_UPLOAD_DIR } from "../middlewares/upload.middleware";
+import { BudgetService } from "./budget.service";
 
 export interface PaginationMeta {
   page: number;
@@ -93,6 +94,12 @@ export class TransactionService {
     const populated = await Transaction.findById(transaction._id)
       .populate("category", "name type icon color isSystem")
       .populate("account", "name type currency");
+
+    if (input.type === "EXPENSE") {
+      BudgetService.checkAndTriggerAlerts(userId, input.category, input.date).catch((err) => {
+        console.error("Budget alert trigger error on create:", err);
+      });
+    }
 
     return populated!;
   }
@@ -334,6 +341,16 @@ export class TransactionService {
     const populated = await Transaction.findById(transaction._id)
       .populate("category", "name type icon color isSystem")
       .populate("account", "name type currency");
+
+    if (transaction.type === "EXPENSE") {
+      BudgetService.checkAndTriggerAlerts(
+        userId,
+        transaction.category.toString(),
+        transaction.date
+      ).catch((err) => {
+        console.error("Budget alert trigger error on update:", err);
+      });
+    }
 
     return populated!;
   }
