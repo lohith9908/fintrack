@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useLocation, Outlet } from "react-router-dom";
+import { Link, useLocation, useNavigate, Outlet } from "react-router-dom";
 import {
   LayoutDashboard,
   ArrowLeftRight,
@@ -22,8 +22,11 @@ import {
   ChevronRight,
   Layers,
   Sparkles,
+  LogOut,
+  User as UserIcon,
 } from "lucide-react";
 import { cn } from "../utils/cn";
+import { useAuth } from "../hooks/useAuth";
 import { useTheme } from "../hooks/useTheme";
 import { IconButton } from "../components/ui/IconButton";
 import { Avatar } from "../components/ui/Avatar";
@@ -44,6 +47,8 @@ interface NavSection {
 
 export const AppLayout: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
   const { resolvedTheme, setTheme, toggleTheme } = useTheme();
   const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState<boolean>(false);
@@ -53,7 +58,7 @@ export const AppLayout: React.FC = () => {
       title: "Overview",
       items: [
         { label: "Dashboard", href: "/dashboard", icon: <LayoutDashboard className="h-4 w-4" /> },
-        { label: "Design System", href: "/", icon: <Sparkles className="h-4 w-4" />, badge: "Phase 6" },
+        { label: "Design System", href: "/design-system", icon: <Sparkles className="h-4 w-4" />, badge: "Showcase" },
       ],
     },
     {
@@ -84,7 +89,9 @@ export const AppLayout: React.FC = () => {
       items: [
         { label: "Notifications", href: "/notifications", icon: <Bell className="h-4 w-4" />, badge: "2" },
         { label: "Settings", href: "/settings", icon: <Settings className="h-4 w-4" /> },
-        { label: "Admin Panel", href: "/admin", icon: <Shield className="h-4 w-4" /> },
+        ...(user?.role === "ADMIN"
+          ? [{ label: "Admin Panel", href: "/admin", icon: <Shield className="h-4 w-4" /> }]
+          : []),
       ],
     },
   ];
@@ -95,6 +102,11 @@ export const AppLayout: React.FC = () => {
     { label: "Budgets", href: "/budgets", icon: <PieChart className="h-5 w-5" /> },
     { label: "Goals", href: "/goals", icon: <Target className="h-5 w-5" /> },
   ];
+
+  const handleLogout = async () => {
+    await logout();
+    navigate("/auth/login", { replace: true });
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col md:flex-row">
@@ -109,7 +121,7 @@ export const AppLayout: React.FC = () => {
       >
         {/* Brand Header */}
         <div className="h-16 px-4 flex items-center justify-between border-b border-border/60">
-          <Link to="/" className="flex items-center space-x-2.5 overflow-hidden">
+          <Link to="/dashboard" className="flex items-center space-x-2.5 overflow-hidden">
             <div className="h-9 w-9 rounded-xl bg-primary text-primary-foreground flex items-center justify-center font-bold shrink-0 shadow-sm shadow-primary/25">
               <Layers className="h-5 w-5" />
             </div>
@@ -179,13 +191,16 @@ export const AppLayout: React.FC = () => {
         {/* User Card in Footer */}
         {!isCollapsed && (
           <div className="p-3 border-t border-border/60">
-            <div className="flex items-center gap-3 p-2 rounded-lg bg-secondary/50 border border-border/40">
-              <Avatar name="Alex Miller" size="sm" status="online" />
+            <Link
+              to="/settings"
+              className="flex items-center gap-3 p-2 rounded-lg bg-secondary/50 border border-border/40 hover:bg-muted transition-colors"
+            >
+              <Avatar name={user?.name || "User"} size="sm" status="online" />
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-bold truncate text-foreground">Alex Miller</p>
-                <p className="text-[10px] text-muted-foreground truncate">alex@fintrack.app</p>
+                <p className="text-xs font-bold truncate text-foreground">{user?.name || "FinTrack User"}</p>
+                <p className="text-[10px] text-muted-foreground truncate">{user?.email || ""}</p>
               </div>
-            </div>
+            </Link>
           </div>
         )}
       </aside>
@@ -239,6 +254,7 @@ export const AppLayout: React.FC = () => {
             <IconButton
               aria-label="Notifications"
               size="sm"
+              onClick={() => navigate("/notifications")}
               icon={
                 <div className="relative">
                   <Bell className="h-4 w-4 text-foreground" />
@@ -251,14 +267,40 @@ export const AppLayout: React.FC = () => {
             <Dropdown
               trigger={
                 <div className="flex items-center gap-2 pl-2 cursor-pointer select-none">
-                  <Avatar name="Alex Miller" size="sm" />
+                  <Avatar name={user?.name || "User"} size="sm" />
                 </div>
               }
               items={[
-                { id: "profile", label: "User Profile", icon: <Settings className="h-4 w-4" /> },
-                { id: "admin", label: "Admin Console", icon: <Shield className="h-4 w-4" /> },
-                { id: "theme-quick", label: `Switch to ${resolvedTheme === "dark" ? "Light" : "Dark"} Mode`, icon: resolvedTheme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />, onClick: toggleTheme },
-                { id: "logout", label: "Sign Out", destructive: true, dividerBefore: true },
+                {
+                  id: "profile",
+                  label: "User Settings",
+                  icon: <UserIcon className="h-4 w-4" />,
+                  onClick: () => navigate("/settings"),
+                },
+                ...(user?.role === "ADMIN"
+                  ? [
+                      {
+                        id: "admin",
+                        label: "Admin Console",
+                        icon: <Shield className="h-4 w-4" />,
+                        onClick: () => navigate("/admin"),
+                      },
+                    ]
+                  : []),
+                {
+                  id: "theme-quick",
+                  label: `Switch to ${resolvedTheme === "dark" ? "Light" : "Dark"} Mode`,
+                  icon: resolvedTheme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />,
+                  onClick: toggleTheme,
+                },
+                {
+                  id: "logout",
+                  label: "Sign Out",
+                  icon: <LogOut className="h-4 w-4 text-destructive" />,
+                  destructive: true,
+                  dividerBefore: true,
+                  onClick: handleLogout,
+                },
               ]}
             />
           </div>
@@ -310,6 +352,14 @@ export const AppLayout: React.FC = () => {
         placement="left"
       >
         <div className="space-y-6">
+          <div className="p-3 rounded-xl border border-border bg-secondary/50 flex items-center gap-3">
+            <Avatar name={user?.name || "User"} size="md" status="online" />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-bold text-foreground truncate">{user?.name || "FinTrack User"}</p>
+              <p className="text-xs text-muted-foreground truncate">{user?.email || ""}</p>
+            </div>
+          </div>
+
           {navigationSections.map((section) => (
             <div key={section.title} className="space-y-1">
               <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">
@@ -333,6 +383,19 @@ export const AppLayout: React.FC = () => {
               ))}
             </div>
           ))}
+
+          <div className="pt-4 border-t border-border/60">
+            <button
+              onClick={() => {
+                setMobileDrawerOpen(false);
+                handleLogout();
+              }}
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-semibold text-destructive hover:bg-destructive/10 transition-colors"
+            >
+              <LogOut className="h-4 w-4" />
+              <span>Sign Out</span>
+            </button>
+          </div>
         </div>
       </Drawer>
     </div>
