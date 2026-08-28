@@ -11,3 +11,5 @@ export * from "./notification.validator";
 export * from "./analytics.validator";
 export * from "./calendar.validator";
 export * from "./report.validator";
+export * from "./admin.validator";
+

@@ -11,3 +11,5 @@ export * from "./notification.service";
 export * from "./analytics.service";
 export * from "./calendar.service";
 export * from "./report.service";
+export * from "./admin.service";
+

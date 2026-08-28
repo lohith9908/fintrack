@@ -14,3 +14,9 @@ export * from "./notifications/NotificationsPage";
 export * from "./analytics/AnalyticsPage";
 export * from "./calendar/CalendarPage";
 export * from "./reports/ReportsPage";
+export * from "./admin/AdminDashboardPage";
+export * from "./admin/AdminUsersPage";
+export * from "./admin/AdminCategoriesPage";
+export * from "./admin/AdminAuditLogsPage";
+export * from "./admin/AdminSettingsPage";
+
