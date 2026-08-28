@@ -10,3 +10,5 @@ export * from "./recurring.controller";
 export * from "./goal.controller";
 export * from "./notification.controller";
 export * from "./analytics.controller";
+export * from "./calendar.controller";
+export * from "./report.controller";

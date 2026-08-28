@@ -11,7 +11,9 @@ import {
   Sun,
   Moon,
   Laptop,
+  Download,
 } from "lucide-react";
+import { ReportService } from "../../services/report.service";
 import { useAuth } from "../../hooks/useAuth";
 import { useTheme } from "../../hooks/useTheme";
 import { useToast } from "../../components/ui/Toast";
@@ -199,6 +201,22 @@ export const SettingsPage: React.FC = () => {
       setDeleteError(msg);
     } finally {
       setIsDeletingAccount(false);
+    }
+  };
+
+  const [isExportingData, setIsExportingData] = useState(false);
+  const handleExportData = async () => {
+    try {
+      setIsExportingData(true);
+      const archive = await ReportService.downloadUserDataArchive();
+      toast.success(
+        `Exported ${archive.exportMetadata.entityCounts.transactions} transactions, ${archive.exportMetadata.entityCounts.accounts} accounts`,
+        "Archive Downloaded"
+      );
+    } catch (err) {
+      toast.error(getErrorMessage(err), "Export Failed");
+    } finally {
+      setIsExportingData(false);
     }
   };
 
@@ -563,6 +581,24 @@ export const SettingsPage: React.FC = () => {
             <CardDescription>Irreversible actions for your FinTrack account and financial data</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl border border-primary/20 bg-primary/5">
+              <div className="space-y-1">
+                <h4 className="text-sm font-bold text-foreground">Export All Financial Data</h4>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  Download a complete, sanitized JSON archive of all your accounts, transactions, budgets, goals, and recurring rules.
+                </p>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleExportData}
+                isLoading={isExportingData}
+                leftIcon={<Download className="h-4 w-4" />}
+              >
+                Export JSON Archive
+              </Button>
+            </div>
+
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl border border-destructive/20 bg-destructive/5">
               <div className="space-y-1">
                 <h4 className="text-sm font-bold text-foreground">Delete FinTrack Account</h4>

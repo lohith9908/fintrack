@@ -21,6 +21,8 @@ import {
   SavingsGoalsPage,
   NotificationsPage,
   AnalyticsPage,
+  CalendarPage,
+  ReportsPage,
 } from "../pages";
 
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "../components/ui/Card";
@@ -114,27 +116,9 @@ export const AppRoutes: React.FC = () => {
             <Route path="/budgets" element={<BudgetsPage />} />
             <Route path="/recurring" element={<RecurringTransactionsPage />} />
             <Route path="/goals" element={<SavingsGoalsPage />} />
-            <Route
-              path="/calendar"
-              element={
-                <PhaseShellPlaceholder
-                  title="Financial Calendar"
-                  phase="Phase 16"
-                  description="Daily expense density and upcoming bill obligations timeline."
-                />
-              }
-            />
+            <Route path="/calendar" element={<CalendarPage />} />
             <Route path="/analytics" element={<AnalyticsPage />} />
-            <Route
-              path="/reports"
-              element={
-                <PhaseShellPlaceholder
-                  title="Reports & Data Export"
-                  phase="Phase 16"
-                  description="PDF summary statements and structured CSV ledger export."
-                />
-              }
-            />
+            <Route path="/reports" element={<ReportsPage />} />
             <Route path="/notifications" element={<NotificationsPage />} />
           </Route>
         </Route>

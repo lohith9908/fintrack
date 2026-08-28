@@ -12,6 +12,8 @@ import { recurringRouter } from "./recurring.routes";
 import { goalRouter } from "./goal.routes";
 import { notificationRouter } from "./notification.routes";
 import { analyticsRouter } from "./analytics.routes";
+import { calendarRouter } from "./calendar.routes";
+import { reportRouter } from "./report.routes";
 
 const router = Router();
 
@@ -50,6 +52,12 @@ router.use("/notifications", notificationRouter);
 
 // Mount Financial Analytics & Insights routes (/api/analytics/...)
 router.use("/analytics", analyticsRouter);
+
+// Mount Financial Calendar routes (/api/calendar/...)
+router.use("/calendar", calendarRouter);
+
+// Mount Financial Reports & Data Export routes (/api/reports/...)
+router.use("/reports", reportRouter);
 
 // Mount Admin routes (/api/admin/...)
 router.use("/admin", adminRoutes);

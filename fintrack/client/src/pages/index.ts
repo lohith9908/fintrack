@@ -12,3 +12,5 @@ export * from "./recurring/RecurringTransactionsPage";
 export * from "./goals/SavingsGoalsPage";
 export * from "./notifications/NotificationsPage";
 export * from "./analytics/AnalyticsPage";
+export * from "./calendar/CalendarPage";
+export * from "./reports/ReportsPage";
