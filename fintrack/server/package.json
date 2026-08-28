@@ -25,6 +25,7 @@
     "test:phase15": "tsx src/tests/e2ePhase15.test.ts",
     "test:phase16": "tsx src/tests/e2ePhase16.test.ts",
     "test:phase17": "tsx src/tests/e2ePhase17.test.ts",
+    "test:phase18": "tsx src/tests/e2ePhase18.test.ts",
     "lint": "eslint src --ext .ts",
     "typecheck": "tsc --noEmit"
   },

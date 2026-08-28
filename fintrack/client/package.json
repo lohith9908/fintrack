@@ -19,7 +19,8 @@
     "test:phase14": "npx tsx src/tests/runtimePhase14.test.tsx",
     "test:phase15": "npx tsx src/tests/runtimePhase15.test.tsx",
     "test:phase16": "npx tsx src/tests/runtimePhase16.test.tsx",
-    "test:phase17": "npx tsx src/tests/runtimePhase17.test.tsx"
+    "test:phase17": "npx tsx src/tests/runtimePhase17.test.tsx",
+    "test:phase18": "npx tsx src/tests/runtimePhase18.test.tsx"
   },
   "dependencies": {
     "axios": "^1.7.9",

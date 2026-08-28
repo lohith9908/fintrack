@@ -28,8 +28,19 @@ export const AdminLayout: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col md:flex-row">
+      {/* Accessible Skip Link per UI_UX.md Section 78 */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-destructive focus:text-destructive-foreground focus:rounded-lg focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-ring font-semibold text-xs transition-all"
+      >
+        Skip to main content
+      </a>
+
       {/* Admin Sidebar */}
-      <aside className="w-full md:w-64 border-r border-border bg-card/80 backdrop-blur-md flex flex-col justify-between sticky top-0 md:h-screen z-30">
+      <aside
+        aria-label="Platform Administration Navigation"
+        className="w-full md:w-64 border-r border-border bg-card/80 backdrop-blur-md flex flex-col justify-between sticky top-0 md:h-screen z-30"
+      >
         <div>
           {/* Brand Header */}
           <div className="h-16 px-4 flex items-center justify-between border-b border-border/60">
@@ -103,7 +114,7 @@ export const AdminLayout: React.FC = () => {
           </div>
         </header>
 
-        <main className="flex-1 w-full max-w-[1440px] mx-auto p-6 lg:p-8">
+        <main id="main-content" tabIndex={-1} className="flex-1 w-full max-w-[1440px] mx-auto p-6 lg:p-8 outline-none">
           <Outlet />
         </main>
       </div>

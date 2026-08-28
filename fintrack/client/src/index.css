@@ -131,7 +131,44 @@
   background: hsl(var(--muted-foreground) / 0.45);
 }
 
-/* Smooth Focus Rings */
+/* Smooth Focus Rings per UI_UX.md Section 8 */
 .focus-ring {
   @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background;
 }
+
+/* Accessibility & Screen Reader Utilities per UI_UX.md Section 78 */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.focus\:not-sr-only:focus {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: inherit;
+  margin: inherit;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
+/* Reduced Motion Override per UI_UX.md Section 77 & IMPLEMENTATION.md Phase 18 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+

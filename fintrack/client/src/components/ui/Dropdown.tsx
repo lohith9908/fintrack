@@ -52,7 +52,20 @@ export const Dropdown: React.FC<DropdownProps> = ({
 
   return (
     <div ref={dropdownRef} className="relative inline-block text-left">
-      <div onClick={() => setIsOpen(!isOpen)} className="cursor-pointer inline-flex">
+      <div
+        role="button"
+        tabIndex={0}
+        aria-haspopup="menu"
+        aria-expanded={isOpen}
+        onClick={() => setIsOpen(!isOpen)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            setIsOpen(!isOpen);
+          }
+        }}
+        className="cursor-pointer inline-flex focus-ring rounded-lg"
+      >
         {trigger}
       </div>
 

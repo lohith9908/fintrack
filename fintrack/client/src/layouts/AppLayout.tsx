@@ -111,10 +111,19 @@ export const AppLayout: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col md:flex-row">
+      {/* Accessible Skip Link per UI_UX.md Section 78 */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-lg focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-ring font-semibold text-xs transition-all"
+      >
+        Skip to main content
+      </a>
+
       {/* ============================================================ */}
       {/* 1. Desktop / Tablet Sidebar per UI_UX.md Section 14 & 15     */}
       {/* ============================================================ */}
       <aside
+        aria-label="Application Sidebar"
         className={cn(
           "hidden md:flex flex-col border-r border-border bg-card/70 backdrop-blur-md transition-all duration-300 z-30 sticky top-0 h-screen",
           isCollapsed ? "w-16" : "w-64"
@@ -298,7 +307,7 @@ export const AppLayout: React.FC = () => {
         </header>
 
         {/* Content Container (max-width ≈ 1440px per UI_UX.md Section 18) */}
-        <main className="flex-1 w-full max-w-[1440px] mx-auto p-4 sm:p-6 lg:p-8">
+        <main id="main-content" tabIndex={-1} className="flex-1 w-full max-w-[1440px] mx-auto p-4 sm:p-6 lg:p-8 outline-none">
           <Outlet />
         </main>
       </div>
