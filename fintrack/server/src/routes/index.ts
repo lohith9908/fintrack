@@ -10,6 +10,8 @@ import { dashboardRouter } from "./dashboard.routes";
 import { budgetRoutes } from "./budget.routes";
 import { recurringRouter } from "./recurring.routes";
 import { goalRouter } from "./goal.routes";
+import { notificationRouter } from "./notification.routes";
+import { analyticsRouter } from "./analytics.routes";
 
 const router = Router();
 
@@ -42,6 +44,12 @@ router.use("/recurring-transactions", recurringRouter);
 
 // Mount Savings Goals routes (/api/goals/...)
 router.use("/goals", goalRouter);
+
+// Mount In-App Notifications routes (/api/notifications/...)
+router.use("/notifications", notificationRouter);
+
+// Mount Financial Analytics & Insights routes (/api/analytics/...)
+router.use("/analytics", analyticsRouter);
 
 // Mount Admin routes (/api/admin/...)
 router.use("/admin", adminRoutes);

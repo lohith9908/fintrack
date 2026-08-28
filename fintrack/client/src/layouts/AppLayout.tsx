@@ -32,6 +32,7 @@ import { IconButton } from "../components/ui/IconButton";
 import { Avatar } from "../components/ui/Avatar";
 import { Drawer } from "../components/ui/Drawer";
 import { Dropdown } from "../components/ui/Dropdown";
+import { NotificationBellDropdown } from "../components/notifications/NotificationBellDropdown";
 
 interface NavItem {
   label: string;
@@ -250,18 +251,8 @@ export const AppLayout: React.FC = () => {
               ]}
             />
 
-            {/* Notification Icon */}
-            <IconButton
-              aria-label="Notifications"
-              size="sm"
-              onClick={() => navigate("/notifications")}
-              icon={
-                <div className="relative">
-                  <Bell className="h-4 w-4 text-foreground" />
-                  <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-primary" />
-                </div>
-              }
-            />
+            {/* Notification Bell Dropdown */}
+            <NotificationBellDropdown />
 
             {/* Profile Dropdown */}
             <Dropdown

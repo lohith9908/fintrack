@@ -8,3 +8,5 @@ export * from "./dashboard.controller";
 export * from "./budget.controller";
 export * from "./recurring.controller";
 export * from "./goal.controller";
+export * from "./notification.controller";
+export * from "./analytics.controller";

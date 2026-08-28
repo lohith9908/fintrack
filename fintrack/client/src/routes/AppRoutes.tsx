@@ -19,6 +19,8 @@ import {
   BudgetsPage,
   RecurringTransactionsPage,
   SavingsGoalsPage,
+  NotificationsPage,
+  AnalyticsPage,
 } from "../pages";
 
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "../components/ui/Card";
@@ -122,16 +124,7 @@ export const AppRoutes: React.FC = () => {
                 />
               }
             />
-            <Route
-              path="/analytics"
-              element={
-                <PhaseShellPlaceholder
-                  title="Analytics & Trends"
-                  phase="Phase 15"
-                  description="Income, expense, and category distribution analytics with deterministic insights."
-                />
-              }
-            />
+            <Route path="/analytics" element={<AnalyticsPage />} />
             <Route
               path="/reports"
               element={
@@ -142,16 +135,7 @@ export const AppRoutes: React.FC = () => {
                 />
               }
             />
-            <Route
-              path="/notifications"
-              element={
-                <PhaseShellPlaceholder
-                  title="Notifications Center"
-                  phase="Phase 15"
-                  description="System alerts, recurring payment reminders, and budget warnings."
-                />
-              }
-            />
+            <Route path="/notifications" element={<NotificationsPage />} />
           </Route>
         </Route>
 

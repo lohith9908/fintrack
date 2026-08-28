@@ -8,3 +8,6 @@ export * from "./dashboard.service";
 export * from "./budget.service";
 export * from "./recurring.service";
 export * from "./goal.service";
+export * from "./notification.service";
+export * from "./insight.service";
+export * from "./analytics.service";

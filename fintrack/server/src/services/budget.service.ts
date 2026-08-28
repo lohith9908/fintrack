@@ -11,6 +11,7 @@ import {
   BadRequestError,
   ConflictError,
 } from "../utils/apiError";
+import { NotificationService } from "./notification.service";
 
 export type BudgetStatus = "HEALTHY" | "WARNING" | "CRITICAL" | "EXCEEDED";
 
@@ -441,13 +442,11 @@ export class BudgetService {
       });
 
       if (!existingAlert) {
-        await Notification.create({
-          user: new mongoose.Types.ObjectId(userId),
+        await NotificationService.createNotification(userId, {
           type: notifType,
           title,
           message,
           severity,
-          read: false,
           metadata: {
             budgetId: budget._id.toString(),
             categoryId: categoryId.toString(),

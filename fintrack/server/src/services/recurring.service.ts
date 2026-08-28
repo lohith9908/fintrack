@@ -8,6 +8,7 @@ import {
 } from "../validators/recurring.validator";
 import { NotFoundError, BadRequestError } from "../utils/apiError";
 import { BudgetService } from "./budget.service";
+import { NotificationService } from "./notification.service";
 
 export interface RecurringSummary {
   activeCount: number;
@@ -422,13 +423,11 @@ export class RecurringService {
         });
 
         if (!existingNotif) {
-          await Notification.create({
-            user: rule.user,
+          await NotificationService.createNotification(rule.user, {
             type: "RECURRING_PAYMENT",
             title: "Recurring Payment Processed",
             message: `Processed scheduled ${rule.type.toLowerCase()} "${rule.name}" for ₹${rule.amount.toLocaleString("en-IN")}.`,
             severity: "INFO",
-            read: false,
             metadata: {
               recurringId: rule._id.toString(),
               occurrenceDate: occurrenceDate.toISOString(),

@@ -7,3 +7,5 @@ export * from "./dashboard.validator";
 export * from "./budget.validator";
 export * from "./recurring.validator";
 export * from "./goal.validator";
+export * from "./notification.validator";
+export * from "./analytics.validator";

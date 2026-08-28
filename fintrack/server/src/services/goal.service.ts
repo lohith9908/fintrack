@@ -9,6 +9,7 @@ import {
 } from "../validators/goal.validator";
 import { NotFoundError, BadRequestError } from "../utils/apiError";
 import { AccountService } from "./account.service";
+import { NotificationService } from "./notification.service";
 
 export interface GoalSummary {
   totalTargetAmount: number;
@@ -265,13 +266,11 @@ export class GoalService {
       });
 
       if (!existingCompletionNotif) {
-        await Notification.create({
-          user: goal.user,
+        await NotificationService.createNotification(goal.user, {
           type: "GOAL_MILESTONE",
           title: "🎯 Savings Goal Achieved!",
           message: `Congratulations! You successfully reached your target of ₹${goal.targetAmount.toLocaleString("en-IN")} for "${goal.name}".`,
           severity: "SUCCESS",
-          read: false,
           metadata: {
             goalId: goal._id.toString(),
             milestone: 100,
@@ -290,13 +289,11 @@ export class GoalService {
       });
 
       if (!existing50Notif) {
-        await Notification.create({
-          user: goal.user,
+        await NotificationService.createNotification(goal.user, {
           type: "GOAL_MILESTONE",
           title: "🌟 Halfway There!",
           message: `You've reached 50% of your savings goal "${goal.name}" (₹${goal.currentAmount.toLocaleString("en-IN")} / ₹${goal.targetAmount.toLocaleString("en-IN")}).`,
           severity: "SUCCESS",
-          read: false,
           metadata: {
             goalId: goal._id.toString(),
             milestone: 50,

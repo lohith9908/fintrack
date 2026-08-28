@@ -473,7 +473,7 @@ export class DashboardService {
     // 11. Unread Notifications Count
     const unreadNotificationsCount = await Notification.countDocuments({
       user: userObjectId,
-      isRead: false,
+      read: false,
     });
 
     // 12. Deterministic Rule-Based Financial Insights
