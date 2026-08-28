@@ -12,9 +12,22 @@ import {
 import {
   NotFoundError,
   BadRequestError,
+  ForbiddenError,
 } from "../utils/apiError";
 import { RECEIPT_UPLOAD_DIR } from "../middlewares/upload.middleware";
 import { BudgetService } from "./budget.service";
+
+/**
+ * Ensures resolved receipt path strictly resides within the configured upload directory
+ */
+const getSafeReceiptPath = (storageKey: string): string => {
+  const resolved = path.resolve(RECEIPT_UPLOAD_DIR, storageKey);
+  const normalizedUploadDir = path.normalize(RECEIPT_UPLOAD_DIR);
+  if (!resolved.startsWith(normalizedUploadDir)) {
+    throw new ForbiddenError("Access denied: Invalid receipt path.");
+  }
+  return resolved;
+};
 
 export interface PaginationMeta {
   page: number;
@@ -385,7 +398,7 @@ export class TransactionService {
 
     // Clean up previous receipt file from disk if replacing
     if (transaction.receipt?.storageKey) {
-      const oldPath = path.resolve(RECEIPT_UPLOAD_DIR, transaction.receipt.storageKey);
+      const oldPath = getSafeReceiptPath(transaction.receipt.storageKey);
       if (fs.existsSync(oldPath)) {
         try {
           fs.unlinkSync(oldPath);
@@ -439,7 +452,7 @@ export class TransactionService {
       throw new NotFoundError("No receipt attached to this transaction.");
     }
 
-    const filePath = path.resolve(RECEIPT_UPLOAD_DIR, transaction.receipt.storageKey);
+    const filePath = getSafeReceiptPath(transaction.receipt.storageKey);
     if (!fs.existsSync(filePath)) {
       throw new NotFoundError("Receipt file not found on storage.");
     }
@@ -472,7 +485,7 @@ export class TransactionService {
     }
 
     if (transaction.receipt?.storageKey) {
-      const filePath = path.resolve(RECEIPT_UPLOAD_DIR, transaction.receipt.storageKey);
+      const filePath = getSafeReceiptPath(transaction.receipt.storageKey);
       if (fs.existsSync(filePath)) {
         try {
           fs.unlinkSync(filePath);
@@ -514,7 +527,7 @@ export class TransactionService {
 
     // Clean up attached receipt file from storage if present
     if (transaction.receipt?.storageKey) {
-      const filePath = path.resolve(RECEIPT_UPLOAD_DIR, transaction.receipt.storageKey);
+      const filePath = getSafeReceiptPath(transaction.receipt.storageKey);
       if (fs.existsSync(filePath)) {
         try {
           fs.unlinkSync(filePath);
